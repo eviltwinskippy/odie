@@ -1,0 +1,5 @@
+
+This directory contains the magic needed to run the ODIE webserver as a Linux service on a debianesque system
+
+cp tclhttpd.rc /etc/init.d/tclhttpd
+cp tclhttpd.defaults /etc/default/tclhttpd

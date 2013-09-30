@@ -1,0 +1,8 @@
+
+0.0.2 - 
+        * Introduced the [K] concept to speed up list functions
+	* Changed ladd to take only one argument
+	  - Sped up performance
+          - I wasn't useing the ability to add an arbitrary number of items
+          - Everyone elses lutil implemnation only takes a single arg
+0.0.1 - Initial public release

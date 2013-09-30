@@ -1,0 +1,23 @@
+
+set m0 [list    TR  EE  TREE  Y  BY]
+set m1 [list   TROUBLE  OATS  TREES  IVY]
+set m2 [list   TROUBLES  PRIVATE  OATEN  ORRERY]
+
+foreach w $m0 {
+    puts "$w [stem::measure [stem::cvform $w]]"
+    if {[stem::measure [stem::cvform $w]] != 0} {
+	puts "error"
+    }
+}
+foreach w $m1 {
+    puts "$w [stem::measure [stem::cvform $w]]"
+    if {[stem::measure [stem::cvform $w]] != 1} {
+	puts "error"
+    }
+}
+foreach w $m2 {
+    puts "$w [stem::measure [stem::cvform $w]]"
+    if {[stem::measure [stem::cvform $w]] != 2} {
+	puts "error"
+    }
+}

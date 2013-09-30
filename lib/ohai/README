@@ -1,0 +1,11 @@
+OHAI
+
+The Open Httpd Application Integrator
+
+Based on Wibble
+
+Notes:
+
+The "wibble.tcl" file should be the most up-to-date copy of wibble from wiki.tcl.tk
+
+Modifications/Customization that pound wibble into OHAI are in the remaining files.

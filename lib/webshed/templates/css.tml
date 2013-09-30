@@ -1,0 +1,8 @@
+left-menu_row   { }
+left-menu_link  { }
+.form { font-size: 8px; color=#990000; verticle-align: middle }
+.input { font-size: 8px; color=#990000; verticle-align: middle }
+.image { font-size: 8px; color=#990000; verticle-align: middle }
+
+
+    	

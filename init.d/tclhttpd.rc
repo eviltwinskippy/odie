@@ -1,0 +1,74 @@
+#! /bin/sh
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/opt/ActiveTcl/bin
+DAEMON=/opt/local/odie/bin/httpd.tcl
+NAME=tclhttpd
+SNAME=tclhttpd
+DESC="TCL Web Server"
+PIDFILE="/var/run/$NAME.pid"
+PNAME="tclhttpd"
+
+export TMPDIR=/tmp
+# Apparently people have trouble if this isn't explicitly set...
+
+ENABLED=0
+OPTIONS=""
+NICE=
+
+test -f /etc/default/tclhttpd && . /etc/default/tclhttpd
+
+#DOPTIONS="-d --pidfile=$PIDFILE"
+DOPTIONS=""
+ 
+if [ "$ENABLED" = "0" ]; then
+    echo "$DESC: disabled, see /etc/default/tclhttpd"
+    exit 0
+fi
+
+test -f $DAEMON || exit 0
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	start-stop-daemon --start --pidfile $PIDFILE --background  --name $PNAME \
+	    $NICE --oknodo --startas $DAEMON -- $OPTIONS $DOPTIONS  &> /dev/null
+
+	echo "$NAME."
+	;;
+
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --pidfile $PIDFILE --name $PNAME \
+	    --retry 5 --oknodo
+#	killall tclsh
+	echo "$NAME."
+	;;
+
+  reload|force-reload)
+	echo -n "Reloading $DESC: "
+	start-stop-daemon --stop --pidfile $PIDFILE --signal HUP --name $PNAME
+	# start-stop-daemon --start --pidfile $PIDFILE --name $PNAME --oknodo
+
+	echo "$NAME."
+	;;
+
+  restart)
+	echo -n "Restarting $DESC: "
+	start-stop-daemon --stop --pidfile $PIDFILE --name $PNAME \
+	    --retry 5 --oknodo
+	start-stop-daemon --start --pidfile $PIDFILE --name $PNAME \
+	    $NICE --oknodo --startas $DAEMON -- $OPTIONS $DOPTIONS
+
+	echo "$NAME."
+	;;
+
+  *)
+	N=/etc/init.d/$SNAME
+	echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

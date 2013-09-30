@@ -1,0 +1,74 @@
+### BEGIN COPYRIGHT BLURB
+#   
+#   TAO - Tcl Architecture of Objects
+#   Copyright (C) 2003 Sean Woods
+#   
+#   See the file "license.terms" for information on usage and redistribution
+#   of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#   
+### END COPYRIGHT BLURB
+
+
+package require listutil
+
+set fin [open abbrv.txt r]
+while { [gets $fin line] >= 0 } {
+    if { $line == {} } continue
+
+    set state [string range $line 0 1]
+    set name  [string range $line 3 end]
+    set state_name($state) [string trim $name]
+}
+close $fin
+
+set fin [open zip.txt r]
+
+array set states {}
+array set cities {}
+
+set lastcity {}
+
+while { [gets $fin line] >= 0 } {
+    set line [split $line ,]
+    set zip  [lindex $line 0]
+    set state [string toupper [lindex $line 1]]
+    set city  [string toupper [lindex $line 2]]
+    ladd states($state) [string range $zip 0 1]
+    ladd cities($state,$city) [string range $zip 0 2]
+    set lastcity $city
+}
+
+set fout [open ../zipcode.rc w]
+puts $fout "
+namespace eval ::zipcode \{
+\t#
+\t# State Abbreviations
+\t#
+\tarray set state_name \{"
+foreach state [lsort [array names state_name]] {
+    puts $fout "[list $state $state_name($state)]"
+}
+puts $fout "\t\}
+\t
+\t#
+\t# State Ranges
+\t#
+\tarray set states \t\{"
+foreach state [lsort [array names states]] {
+    puts $fout "[list $state $states($state)]"
+}
+puts $fout "\t\}"
+
+puts $fout "\t#
+\t# Major Cities
+\t#
+\tarray set cities \{"
+foreach city [lsort [array names cities]] {
+    if { [llength $cities($city)] > 1 } { 
+	    puts $fout "[list $city $cities($city)]"
+    }
+}
+puts $fout "\t\}"
+puts $fout "\}"
+
+close $fout

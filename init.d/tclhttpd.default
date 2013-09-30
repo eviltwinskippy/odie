@@ -1,0 +1,17 @@
+# /etc/default/tclhttpd
+# Sean Woods
+
+ENABLED=1
+
+# Options
+	
+OPTIONS="-port 80"
+
+# Pid file
+# Where should spamd write its PID to file? If you use the -u or
+# --username option above, this needs to be writable by that user.
+# Otherwise, the init script will not be able to shut spamd down.
+PIDFILE="/var/run/tclhttpd.pid"
+
+# Set nice level of spamd
+NICE="--nicelevel 0"

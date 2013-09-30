@@ -1,0 +1,98 @@
+This file describes any changes to the file structure of the ODIE system
+
+---- Notes ----
+
+We are in an interim step in development. More changes to follow 
+as we break the odie system into component pieces. In it's final form, 
+ODIE will be a set of libraries that are called by an application.
+
+At present we have 2 main "applications" that employ ODIE:
+
+preen    - a suite of network and server management scripts
+taohttpd - an object oriented server-side scripting engine for web 
+           development
+
+Man of the files in the /lib directory are actually stand-alone TCL 
+packages from other sources. It was easier to bundle them in this form 
+for the early phases of development.
+
+---- CHANGELOG ----
+--2004-08-10--
+More OSX porting mods
+
+Eliminated the distinction between ::odie::node, 
+::odie::node::sqlrecord, and ::odie::node::sqllink 
+
+Moved GetLinks, GetReferences, AccessControlLists to core/node 
+baseclass. (Decendents can always elect NOT to use them.)
+
+Further development of the calendar
+
+Added preliminary version of webdav package
+
+Modifications to the firewall generator scripts 
+--2004-08-05--
+
+Layout changes to facilitate OSX development. From now on all scripts
+should reference $::odie(root) instead of hard-coding /usr/odie. On
+OSX odie is installed along with Fink in the /sw/odie directory. On
+Windows or MacOS Classic Odie will be stored in a different location
+still. 
+
+The Ideal is for ODIE to be completely self-contained. I'm tempted to 
+move the odie/etc/network.rc file to the /etc folder. Time will tell...
+
+Linux users won't see any difference with the change. ODIE for Linux, 
+BSD, and most other Unixes will be installed under /usr/odie. For Darwin
+(OSX) /sw/odie.
+
+
+--2004-07-26--
+
+
+Several modifications to keep web development from trampling over 
+production system configuration files. The "/usr/odie/apps/netlogon" 
+folder has been moved to /usr/local/netlogon. The appropriate areas of 
+samba have been alerted to the change. The old location is still 
+present, in case some process pulls up an old samba configuration.
+
+The /usr/odie/scripts/sync script has been modified. the "code" option 
+has been broken into a few optional pieces. (Code still works the same 
+way)
+
+
+/lib /bin and /scripts are maintained as "lib" 
+
+/etc and .security are now maintained as "config"
+/apps is maintainted as "apps"
+
+If you want a full download of the /usr/odie filesystem use "world" 
+
+The update_ntgroups scripts has been move to the netlogon directory. 
+The user management adduser and group scripts have been modified to call 
+update_ntgroups after every action. For the present, assume that all 
+adduser and group modifications should be run on the domain controller.
+
+***
+
+Added revision control system. Every modification to the system is now
+performed using /usr/odie/scripts/diff
+
+DIFF generates patches that can be used to roll back modifications to 
+the system.
+
+***
+
+Change the name of /usr/odie/scripts/diff to /usr/odie/scripts/revision
+
+Added "merge" command so changes can be rolled into a system you don't
+want to sync (i.e. under revision but needs updates anyway)
+
+Several bug fixes 
+
+--END 2004-07-26--
+	
+2004-07-01 (Approx)
+Application modules banished from the /lib directory. A new directory 
+has been created called "apps"
+

@@ -1,0 +1,21 @@
+#!/usr/bin/make
+
+###
+# Project Makefile
+###
+# Common Settings
+export LDFLAGS=-headerpad_max_install_names -Wl,-search_paths_first
+export CFLAGS=-O2 -DALLOW_EMPTY_EXPAND -arch x86_64 -arch i386 -pipe -fvisibility=hidden   -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.5
+LOCAL_REPO=${HOME}/odie
+SANDBOX=${LOCAL_REPO}/sandbox
+DOWNLOAD=${LOCAL_REPO}/download
+EXTRAFLAGS=--enable-aqua=yes 
+
+###
+# Unix settings
+TCL_SHELL=${LOCAL_REPO}/bin/tclsh8.6
+WISH_SHELL=${LOCAL_REPO}/bin/wish8.6
+ODIEKIT=${LOCAL_REPO}/bin/odiekit_bare
+PLATFORM=unix
+
+include scripts/makefile.common

@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>[::page title]</title>
+[::html-style::template css/style]
+[::html-style::template jsmenu]
+[::page javascript]
+</head>
+<body>
+[::page::menu]
+<div id="content">
+<h3>[::page title]</h3>
+[if [catch {wiki::expand [::page content]} err] { 
+	    return "Error Displaying Record:
+<hr>
+$err
+<hr>
+<pre>
+$::errorInfo
+</pre>
+"
+}
+return $err]
+[if { [string trim [::page links]] != {} } {
+   return "<hr />
+Links:<br>
+$links
+"
+}]
+</div>
+</body>
+</html>

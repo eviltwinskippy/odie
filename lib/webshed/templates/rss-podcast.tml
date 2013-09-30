@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+
+<channel>
+<title>$title</title>
+<link>http://www.example.com/podcasts/everything/index.html</link>
+<language>en-us</language>
+<copyright>&#xA9; [clock format [clock seconds] -format %Y] $copyright</copyright>
+
+<itunes:subtitle>$subtitle</itunes:subtitle>
+<itunes:author>$author</itunes:author>
+
+<itunes:summary>$summary</itunes:summary>
+<description>$summary</description>
+
+<itunes:owner>
+<itunes:name>$owner_name</itunes:name>
+<itunes:email>$owner_email</itunes:email>
+</itunes:owner>
+
+<itunes:image href="$image" />
+<itunes:category text="[join $categories "\">\n<itunes:category text=\"]\">
+
+[podcast_items]
+
+</channel>
+</rss>

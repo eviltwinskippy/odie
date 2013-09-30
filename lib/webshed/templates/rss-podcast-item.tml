@@ -1,0 +1,11 @@
+<item>
+<title>$title</title>
+<itunes:author>$author</itunes:author>
+<itunes:subtitle>$subtitle</itunes:subtitle>
+<itunes:summary>$summary</itunes:summary>
+<itunes:image href=\"$imageurl\" />
+[podcast_link $filename]
+<pubDate>[dateStamp $ctime]</pubDate>
+<itunes:duration>$duration</itunes:duration>
+<itunes:keywords>[join $keywords ,]</itunes:keywords>
+</item>

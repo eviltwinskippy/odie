@@ -1,0 +1,48 @@
+#!/usr/bin/make
+
+###
+# Project Makefile
+###
+
+###
+# Setting applied by template
+###
+TOP=%hpath%
+BAREKIT=%barekit%
+EXE=%exe%
+ZIP=%path_to_zip%
+ZIPSETUP=%path_to_zipsetup%
+TCLSH=%path_to_tclsh%
+KITMAKERROOT=%kitmakerroot%
+
+###
+# Feel free to modify these
+###
+PROJECT=toadkit
+SOURCES=${PROJECT}.vfs
+BAREKITLOCAL=toadkit_barekit${EXE}
+
+all: ${PROJECT}${EXE}
+
+clean:
+	rm -rf *.vfs
+	rm ${PROJECT}${EXE}
+	rm ${BAREKITLOCAL}
+
+${PROJECT}${EXE}: ${BAREKITLOCAL} ${PROJECT}.vfs
+	cp ${BAREKIT} toadkit_bare
+	${ZIP} -q -0 ${PROJECT}.zip toadkit_bare
+	cd ${PROJECT}.vfs ; ${ZIP} -rAq ../${PROJECT}.zip .
+	echo Fixing EXE
+	${ZIPSETUP} ${PROJECT}.zip toadkit_bare
+	mv -f ${PROJECT}.zip ${PROJECT}${EXE}
+	chmod +x ${PROJECT}${EXE}
+
+${PROJECT}.vfs:
+	mkdir -p ${PROJECT}.vfs/
+	cp -a ~/odie/zipdir/* ${PROJECT}.vfs/
+	cp -af src/* ${PROJECT}.vfs/
+	${TCLSH} loader.tcl ${PROJECT}.vfs
+
+${BAREKITLOCAL}:
+	cp -f ${BAREKIT} ${BAREKITLOCAL}

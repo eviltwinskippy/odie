@@ -1,0 +1,17 @@
+<html>
+<head>
+<title>Please Log in</title>
+</head>
+<body>
+<h1>Please Log In</h1>
+<form method=post action=/login/authenticate>
+<table>
+<tr><td>Username</td><td><input name=username></td></tr>
+<tr><td>Password</td><td><input type=password name=plaintext></tr></tr>
+<tr><td colspan=2 align=right><i>Remember My Password</i>
+<input type=checkbox name=remember value=true></td></tr>
+<TR><TD colspan=2 align=right><input type=submit value=logon></TD></TR>
+</TABLE>
+</FORM>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<table>
+<tr><td bgcolor=red>
+<h1>Access Denied</h1>
+</td></tr>
+<tr><td>You do not have the right access level to have been doing what
+your were trying to do.
+</td></tr>
+<tr><td align=right>-The Management</td></tr>
+</table>
+[if [info exists $url] {
+if { $url != {} } {
+   return [::wiki::url $url {Return}]
+}
+return {}]

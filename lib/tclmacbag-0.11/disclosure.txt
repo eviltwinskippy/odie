@@ -1,0 +1,8 @@
+<ijchain> <jenglish> Generate a separate image for each state (you'll want at least "normal" and "selected"; probably "alternate" (for tristate) possibly "pressed" / "selected pressed" / "alternate pressed", possibly "active" / "active pressed" / "alternate pressed", probably "disabled" and "disabled selected".
+<ijchain> <jenglish> Then use [ttk::style element create My.check image ....] to build the element ...
+<ijchain> <jenglish> .... and [ttk::style layout My.TCheckbutton { My.check -side left My.label }] to define the layout ...
+<ijchain> <jenglish> .... then [ttk::checkbutton $cb -style My.TCheckbutton] to use it in a widget.
+
+<ijchain> <jenglish> You might also want to change the bindings so that it activates on ButtonPress instead of ButtonRelease.
+<ijchain> <jenglish> For that, use something like: [ttk::checkbutton $cb -class Disclosure -style Disclosure.TCheckbutton]
+

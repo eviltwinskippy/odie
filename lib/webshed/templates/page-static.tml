@@ -1,0 +1,18 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> 
+<head>
+<title>[::page title]</title>
+[::html-style::template css/style]
+[::html-style::template jsmenu]
+[::page javascript]
+</head>
+<body>
+<div id="menu">
+[::page menu]
+</div>
+<div id="content">
+<h3>[::page title]</h3>
+[::page content]
+</div>
+</body>
+</html>

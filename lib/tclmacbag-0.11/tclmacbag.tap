@@ -1,0 +1,90 @@
+format  {TclDevKit Project File}
+fmtver  2.0
+fmttool {TclDevKit TclApp PackageDefinition} 4.0
+
+########
+#####
+###
+##
+#
+
+Package  {tclmacbag 0.11}
+Base     @TAP_DIR@
+Desc     {Internal package, file list}
+Hidden   {}
+
+Path     dbutton.tcl
+Path     dframe.tcl
+Path     groupbox.tcl
+Path     listbox.tcl
+Path     pkgIndex.tcl
+Path     pnb.tcl
+Path     scrolledframe.tcl
+Path     tclmacbag.tcl
+Path     text.tcl
+Path     Resources/chrome-down.gif
+Path     Resources/chrome-left-down.gif
+Path     Resources/chrome-left-up.gif
+Path     Resources/chrome-middle-down.gif
+Path     Resources/chrome-middle-up.gif
+Path     Resources/chrome-right-down.gif
+Path     Resources/chrome-right-up.gif
+Path     Resources/chrome-up.gif
+Path     Resources/dbutton-closed.png
+Path     Resources/dbutton-open.png
+Path     Resources/dbutton-plus.png
+Path     Resources/dframe-closed.png
+Path     Resources/dframe-minus.png
+Path     Resources/dframe-open.png
+Path     Resources/dframe-plus.png
+Path     Resources/gel-down.gif
+Path     Resources/gel-small-down.gif
+Path     Resources/gel-small-up.gif
+Path     Resources/gel-up.gif
+Path     Resources/help-mac.gif
+Path     Resources/help-windows.gif
+Path     Resources/help-x11.gif
+Path     Resources/pill-down.gif
+Path     Resources/pill-left-down.gif
+Path     Resources/pill-left-up.gif
+Path     Resources/pill-middle-down.gif
+Path     Resources/pill-middle-up.gif
+Path     Resources/pill-right-down.gif
+Path     Resources/pill-right-up.gif
+Path     Resources/pill-up.gif
+Path     Resources/search-magglass.gif
+Path     Resources/search1.gif
+Path     Resources/search2.gif
+Path     Resources/search3.gif
+Path     Resources/simple-down.gif
+Path     Resources/simple-left-down.gif
+Path     Resources/simple-left-up.gif
+Path     Resources/simple-middle-down.gif
+Path     Resources/simple-middle-up.gif
+Path     Resources/simple-right-down.gif
+Path     Resources/simple-right-up.gif
+Path     Resources/simple-up.gif
+Path     Resources/steel-down.gif
+Path     Resources/steel-left-down.gif
+Path     Resources/steel-left-up.gif
+Path     Resources/steel-middle-down.gif
+Path     Resources/steel-middle-up.gif
+Path     Resources/steel-right-down.gif
+Path     Resources/steel-right-up.gif
+Path     Resources/steel-up.gif
+Path     Resources/tnb-left-down.gif
+Path     Resources/tnb-left-pressed.gif
+Path     Resources/tnb-left-up.gif
+Path     Resources/tnb-middle-down.gif
+Path     Resources/tnb-middle-pressed.gif
+Path     Resources/tnb-middle-up.gif
+Path     Resources/tnb-right-down.gif
+Path     Resources/tnb-right-pressed.gif
+Path     Resources/tnb-right-up.gif
+
+#
+##
+###
+#####
+########
+
