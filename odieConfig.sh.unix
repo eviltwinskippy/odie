@@ -1,0 +1,16 @@
+#!/usr/bin/make
+
+###
+# Project Makefile tailored for a Generic Unix
+###
+
+export LDFLAGS=
+
+# Flags to be fed to configure
+# Given in the makefile: --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib
+TCL_CONFIG_FLAGS=
+TK_CONFIG_FLAGS=
+export TCL_SHELL=${LOCAL_REPO}/bin/tclsh8.6
+export WISH_SHELL=${LOCAL_REPO}/bin/wish8.6
+
+PLATFORM=unix

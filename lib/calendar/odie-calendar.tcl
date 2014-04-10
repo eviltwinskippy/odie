@@ -53,7 +53,7 @@ return [gregorian_to_julian $date]
 }
 
 ###
-# topic: 07382ef9-81fa-ba8a-10b7-4c31e7de4e99
+# topic: a3e2835c-a1c8-7201-432b-344686665db7
 ###
 proc ::calendar::dateStamp {{time now}} {
     if { $time == "now" } {
@@ -368,7 +368,7 @@ proc ::calendar::gregorian_to_julian date {
     }
 
 ###
-# topic: 2298d2fd-cdf3-421e-081d-fca5ae261ad5
+# topic: a43732f2-19f6-8605-12c5-c400d74bf003
 ###
 proc ::calendar::int_toWeekday int {
 variable days_long
@@ -376,7 +376,7 @@ return [lindex $days_long $int]
 }
 
 ###
-# topic: fc72451b-9a95-bcc0-b625-7f18a63c0720
+# topic: d882165d-15ed-33de-f268-18b24d0bf3ce
 ###
 proc ::calendar::julian_dayOfWeek j {
 return [expr { ( $j + 1 ) % 7 }]

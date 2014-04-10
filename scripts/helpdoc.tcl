@@ -208,7 +208,7 @@ proc ::irm::helpDocCreate filename {
   }
   $object timeout 10000
   $object busy ::irm::busy
-  $object private Database journal_mode 0
+  $object journal_mode 0
   if {!$exists} {
     catch {toplevel .pleasewait
     label .pleasewait.l -text "Creating Documentation Database"

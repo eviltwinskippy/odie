@@ -36,10 +36,7 @@ proc ::smtp::send {tolist sender body} {
       if { $port eq {} } {
         set port smtp
       }
-      puts [list opening socket $hostname $port]
       set sock [socket $hostname $port]
-      puts [list sender $sender]
-      puts [list rcpt $tolist]
     fconfigure $sock -blocking 1 -buffering line
     smtp_send_line $sock "HELO [info hostname]"
     smtp_send_line $sock "MAIL FROM: <$sender>"

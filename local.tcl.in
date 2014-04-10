@@ -1,0 +1,72 @@
+###
+# The properties in this file are propagates out to all modules
+# (This file is loaded before the code in scripts/*)
+###
+array set ::odie {}
+
+###
+# Directory where packages and binaries are installed
+# (Must be an absolute path name)
+###
+set ::odie(local_repo) [file normalize ~/odie]
+
+###
+# Directory where source repositories are downloaded
+###
+set ::odie(download) [file join $::odie(local_repo) download]
+
+###
+# Directory where package source code is unpacked and compiled
+# (Must be an absolute path name)
+###
+set ::odie(sandbox) [file join $::odie(local_repo) sandbox]
+
+###
+# List paths where fossil repositories are stored
+# (To save us having to download things...)
+###
+set ::odie(fossil_paths) {}
+# Add our download directory
+lappend ::odie(fossil_paths) $::odie(download)
+
+###
+# Directory to save packages for inclusion in builds
+###
+set ::odie(zipdir) [file join $::odie(local_repo) zipdir]
+
+###
+# Which extensions to link statically
+###
+switch $::tcl_platform(platform) {
+  windows {
+    set ::odie(static_linked_extensions) {tcl tk registry dde}
+  }
+  default {
+    set ::odie(static_linked_extensions) {tcl tk}
+  }
+}
+
+###
+# Tclsh to use for building
+# The default is to prefer the version built by odie,
+# and fall back to whatever shell is running this script of
+# odie hasn't been built yet
+###
+if {[file exists $::odie(local_repo)/bin/tclsh86.exe]} {
+  set ::odie(tcl_shell) [file normalize $::odie(local_repo)/bin/tclsh86.exe]
+} elseif {[file exists $::odie(local_repo)/bin/tclsh86s.exe]} {
+  set ::odie(tcl_shell) [file normalize $::odie(local_repo)/bin/tclsh86s.exe]
+} elseif {[file exists $::odie(local_repo)/bin/tclsh86]} {
+  set ::odie(tcl_shell) [file normalize $::odie(local_repo)/bin/tclsh8.6]
+} else {
+  set ::odie(tcl_shell) [info nameofexecutable]
+}
+if {[file exists $::odie(local_repo)/bin/wish86s.exe]} {
+  set ::odie(wish_shell) [file normalize $::odie(local_repo)/bin/wish86s.exe]
+} elseif {[file exists $::odie(local_repo)/bin/wish86.exe]} {
+  set ::odie(wish_shell) [file normalize $::odie(local_repo)/bin/wish86.exe]
+} elseif {[file exists $::odie(local_repo)/bin/wish86]} {
+  set ::odie(wish_shell) [file normalize $::odie(local_repo)/bin/wish8.6]
+} else {
+  set ::odie(wish_shell) [file normalize $::odie(local_repo)/bin/wish]
+}

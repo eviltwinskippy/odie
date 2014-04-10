@@ -1,0 +1,34 @@
+#! /bin/sh
+
+# Pull changes from external repos
+fossil pull -R /opt/fossil/tcl.fos
+fossil pull -R /opt/fossil/tk.fos
+fossil pull -R /opt/fossil/tcllib.fos
+fossil pull -R /opt/fossil/tklib.fos
+fossil pull -R /opt/fossil/tclconfig.fos
+fossil pull -R /opt/fossil/tclapps.fossil
+fossil pull -R /opt/fossil/tdbc.fossil
+fossil pull -R /opt/fossil/tdbcmysql.fossil
+fossil pull -R /opt/fossil/tdbcodbc.fossil
+fossil pull -R /opt/fossil/tdbcpostgres.fossil
+fossil pull -R /opt/fossil/tdbcsqlite.fossil
+fossil pull -R /opt/fossil/sampleextension.fossil
+fossil pull -R /opt/fossil/mclistbox.fossil
+fossil pull -R /opt/fossil/widget.fossil
+fossil pull -R /opt/fossil/bwidget.fossil
+fossil pull -R /opt/fossil/tclbench.fossil
+
+# Sync with external repos I maintain
+fossil pull -R /opt/fossil/canvas3d.fos
+fossil push -R /opt/fossil/canvas3d.fos
+# Local servers
+#droidwarz.fossil
+#mmtk.fos
+#odie.fossil
+#pff.fossil
+#tclsqlite.fos
+#tclvfs.fossil
+#tkhtml.fos
+#tkimg.fossil
+#tls.fossil
+#wub.fossil

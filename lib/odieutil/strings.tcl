@@ -67,7 +67,7 @@ proc ::ostring::cache {entry {newvalue {}}} {
 #    stem::cvform
 #    
 #    convert the word to CV form as required by porter
-# arguments: word   -- a word
+# arguments: word -- a word
 ###
 proc ::ostring::cvform word {
     ##
@@ -184,7 +184,7 @@ return [::calendar::detect_time $rawstring]
 }
 
 ###
-# topic: 1138538e-faaa-488e-10f5-d049bce14364
+# topic: 03fc2689-5aaa-fe1a-825a-f16ad8c30d4f
 ###
 proc ::ostring::dumpCache file {
     variable cache
@@ -255,7 +255,7 @@ proc ::ostring::metaphone { string } {
 #    stem
 #    
 #    find the stem of a word
-# arguments: word     -- a word to stem
+# arguments: word -- a word to stem
 ###
 proc ::ostring::porter word {
         variable cache

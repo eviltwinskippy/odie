@@ -8,8 +8,6 @@ package require http
 ###
 # topic: 04858067-e9b3-f868-dc51-5408be0a61c1
 # description:
-#    return [::llama::wiki::expand $data]
-#    }
 ###
 proc ::llama::wiki::/sql {} {
   return ::sqldb
@@ -62,7 +60,7 @@ proc ::wiki::create_button info {
 }
 
 ###
-# topic: aae4ad8b-268a-4782-0ecd-b63fd70e86b6
+# topic: 65f25135-4742-8c21-b7c1-74867419d650
 ###
 proc ::wiki::defaultMethod {} {
   return display
@@ -76,7 +74,7 @@ proc ::wiki::expand args {
 }
 
 ###
-# topic: ad9f3679-b52e-ef2c-72f7-618a24e8d7c5
+# topic: 1ced53fa-2e6f-f018-a37b-2159eaf21059
 ###
 proc ::wiki::FindTopic {topicTitle {text {}}} {
   set row [db eval {select node_id,title from community where node_id=$topicTitle or title=$topicTitle limit 1}]
@@ -231,8 +229,10 @@ proc ::wiki::html/node/edit {node {query {}}} {
   if { $node eq {} } {
     error "Unknown"
   }
+  set action [dictGet $query action]
+  set mode [dictGet $query mode]
+
   if {$query != {}} {
-    set action [dictGet $query action]
     switch $action {
       save {
         nodePut $node $query
@@ -240,9 +240,21 @@ proc ::wiki::html/node/edit {node {query {}}} {
       copy {
         set node [nodeCreate $query]
       }
+      html {
+        set mode html
+      }
+      wysiwig {
+        set mode wysiwyg
+      }
     }
   }
   set data [nodeGet $node]
+
+  if { $action eq "preview" || $action eq "save" } {
+    foreach {var val} $query {  
+      dict set data $var $val
+    }
+  }
 
   dict with data {
     ::page title $title
@@ -252,6 +264,7 @@ proc ::wiki::html/node/edit {node {query {}}} {
     ::page layout $layout
     ::page links {}
   }
+  append content "<hr>[dictGet $data entry]<hr>"
   append content "<form action=/wiki/$node/edit method=post>"
   #append content "<input type=hidden name=node value=\"$node\">"
   append content "<table><tr><th>Title:</th><td>"
@@ -264,9 +277,21 @@ proc ::wiki::html/node/edit {node {query {}}} {
   append content "</td></tr>"
   append content "<tr><td>Preview</td><td><input name=preview value=\"[dictGet $data preview]\"></tr>"
   append content "<tr><td colspan=2>"
-  append content [::html-style::htmlentry entry $entry { style="height: 800px; width: 600px;"}]
+  if { $mode eq "wysiwyg" } {
+    append content [::html-style::htmlentry entry $entry { style="height: 800px; width: 600px;"}]
+  } else {
+    append content "<textarea rows=30 cols=80 name=\"entry\">[dict get $data entry]</textarea>"
+  }
   append content "</td></tr>"
   append content "</table>"
+  append content "<input type=hidden name=mode value=\"$mode\">"
+  if { $mode eq "wysiwyg" } {
+    append content "<input type=submit name=action value=html>"
+  } else {
+    append content "<input type=submit name=action value=wysiwyg>"
+  }
+  append content "<input type=submit name=action value=preview>"
+
   append content "<input type=submit name=action value=save>"
   append content "<input type=submit name=action value=copy>"
   append content {</form>}
@@ -322,7 +347,7 @@ proc ::wiki::html/node/root {node {query {}}} {
 }
 
 ###
-# topic: e6f08a87-41fe-cd06-1178-63384237746f
+# topic: f315394d-3810-eb66-0b4d-a7705a5a69c1
 ###
 proc ::wiki::httpdMethodAlias {method node} {
   set method [string trimleft [string tolower $method] html]
@@ -347,7 +372,7 @@ proc ::wiki::httpdMethodAlias {method node} {
 }
 
 ###
-# topic: 78acb5a1-d725-31fc-3f56-733f767ab04c
+# topic: 649354b0-2844-645d-599f-ca911a7364c4
 ###
 proc ::wiki::MarshallArguments {prefix suffix input} {
   ###
@@ -436,12 +461,12 @@ proc ::wiki::MarshallArguments {prefix suffix input} {
 }
 
 ###
-# topic: 13f25053-0209-934b-b857-4895d043ad6b
+# topic: 27cbbad4-c734-65fd-f359-b9d9d20a85f5
 ###
 proc ::wiki::menuMethods args {}
 
 ###
-# topic: 9b34554c-0fe0-e1ba-589e-029742762dc2
+# topic: 00947abb-4d22-9ba9-6cc3-bc6e0212d548
 ###
 proc ::wiki::menuNavigation args {}
 
@@ -453,14 +478,14 @@ proc ::wiki::newnode {} {
 }
 
 ###
-# topic: 4a8f0d6b-f9da-1187-2103-1c3f69dd35ad
+# topic: 632835df-7769-a3c4-acd0-f0d38f3099f5
 ###
 proc ::wiki::nodeAlias node {
   return [db one {select node_id from community where node_id=$node or title=$node limit 1}]
 }
 
 ###
-# topic: f8e7b945-9957-5228-def0-fb806913642e
+# topic: 8308b84e-1508-c9e5-ac7e-7e040f48b24c
 ###
 proc ::wiki::nodeCreate record {
   set node_id [newnode]
@@ -472,7 +497,7 @@ proc ::wiki::nodeCreate record {
 }
 
 ###
-# topic: a6ed3ed9-0f3c-a892-3a23-dc3c86463d1d
+# topic: 01cbf8a1-f1c1-cff3-0770-be6fdec78996
 ###
 proc ::wiki::nodeExists node {
   set row [db eval {select node_id,title from community where  node_id=$node or title=$node limit 1}]
@@ -483,7 +508,7 @@ proc ::wiki::nodeExists node {
 }
 
 ###
-# topic: 1235c019-2972-f89b-1eaf-12b573152692
+# topic: 5940a7e1-22b6-3be4-21a4-7b76aaece842
 ###
 proc ::wiki::nodeGet node {
   db eval {select * from community where node_id=$node or title=$node limit 1} record {}
@@ -495,7 +520,7 @@ proc ::wiki::nodeGet node {
 }
 
 ###
-# topic: 24b7e3c6-e3b5-49ef-eac5-adbec3390f67
+# topic: a90ad58c-94cb-77e9-c5a5-196881f91303
 ###
 proc ::wiki::nodeGetField {topic_id field} {
   set record [nodeGet $topic_id]
@@ -506,7 +531,7 @@ proc ::wiki::nodeGetField {topic_id field} {
 }
 
 ###
-# topic: 108b71f7-2356-5073-6dd9-c55b2e2c9794
+# topic: bac86bec-a58d-9634-3b23-419f63a59147
 ###
 proc ::wiki::nodePut {node record} {
   db eval {select * from community where node_id=$node or title=$node limit 1} oldrecord {}
@@ -543,14 +568,14 @@ proc ::wiki::nodePut {node record} {
 }
 
 ###
-# topic: d10c1558-818f-4cc9-70ca-0312836a62aa
+# topic: e653b6cf-f0cf-88d5-7941-acb924b2a215
 ###
 proc ::wiki::nodeUrl {node {method {}}} {
   return "/wiki/$node"
 }
 
 ###
-# topic: 8f7a1afc-2217-0d55-3f05-491b2c4fd9a7
+# topic: 9a387653-558b-d7de-5b57-7e079924c941
 ###
 proc ::wiki::SearchResult {nodeid {count 0} {showColumns {}} {method {}} {print {}}} {
     set colors  [list $::colors(rowcolor0) $::colors(rowcolor1)]

@@ -1,0 +1,17 @@
+#! /bin/sh
+# The next line is executed by /bin/sh, but not tcl \
+exec tclsh $0 ${1+"$@"}
+
+set toadkit_script [file normalize [info script]]
+set here [file dirname $toadkit_script]
+source [file join $here .. lib odie index.tcl]
+
+if {$argv eq {} } {
+  set base [pwd]
+} else {
+  set base $argv  
+}
+if {[file exists $base/pkgIndex.tcl]} {
+  file delete $base/pkgIndex.tcl
+}
+::codebale::pkg_mkIndex $base

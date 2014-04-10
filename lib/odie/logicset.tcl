@@ -91,8 +91,8 @@ ensemble_method ::logicset::remove {setvar args} {
     set result {}
   }
   foreach arg $args {
-    while { $arg in $result } {
-      ldelete result $arg
+    while {[set idx [lsearch $result $arg]] >= 0} {
+      set result [lreplace $result $idx $idx]
     }
   }
   return $result
@@ -148,6 +148,20 @@ ensemble_method ::logicset::union {A B} {
   add result {*}$A
   add result {*}$B
   return $result
+}
+
+ensemble_method ::logicset::permutation items {
+  set l [llength $items]
+  if {[llength $items] < 2} {
+    return $items
+  } else {
+    for {set j 0} {$j < $l} {incr j} {
+      foreach subcomb [permutation [lreplace $items $j $j]] {
+        lappend res [concat [lindex $items $j] $subcomb]
+      }
+    }
+    return $res
+  }
 }
 
 ensemble_build ::logicset

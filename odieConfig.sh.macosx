@@ -1,0 +1,15 @@
+###
+# Project Makefile tailored for Mac OSX
+###
+# Common Settings
+export LDFLAGS=-headerpad_max_install_names -Wl,-search_paths_first
+export CFLAGS=-Os -DALLOW_EMPTY_EXPAND -arch x86_64 -arch i386 -pipe -fvisibility=hidden   -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.5
+
+# Flags to pass to configure
+# Given in the makefile: --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib
+TCL_CONFIG_FLAGS=--enable-framework=no
+TK_CONFIG_FLAGS=--enable-aqua=yes --enable-corefoundation=yes
+TCL_SHELL=${LOCAL_REPO}/bin/tclsh8.6
+WISH_SHELL=${LOCAL_REPO}/bin/wish8.6
+
+PLATFORM=unix

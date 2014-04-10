@@ -3,7 +3,7 @@
 ::namespace eval ::wibble::zone {}
 
 ###
-# topic: 1dd9b7f0-f034-eff3-7353-03a8c24bac09
+# topic: d64aa5fb-150e-dace-41de-411732b97a31
 ###
 proc ::Config args {
   switch [llength $args] {
@@ -18,7 +18,7 @@ proc ::Config args {
 }
 
 ###
-# topic: 72859fe0-15b0-3bc6-3e62-32c7cc97434b
+# topic: 265b384b-b5c7-8c29-029a-620d67fe8a86
 ###
 proc ::Cookie_Get field {
   global current_state
@@ -26,7 +26,7 @@ proc ::Cookie_Get field {
 }
 
 ###
-# topic: a14b0f72-bee1-8bf3-7c11-2fff784f45e4
+# topic: fada3af1-c40e-8fef-e184-56e6296e776e
 ###
 proc ::Direct_Url {virtual {prefix {}} {inThread 0}} {
   global Direct
@@ -38,7 +38,7 @@ proc ::Direct_Url {virtual {prefix {}} {inThread 0}} {
 }
 
 ###
-# topic: 39c78e65-d85c-f6f9-e2ab-b3b7f07286b9
+# topic: 980e46ee-ef2e-79c1-2ac2-95ae5982b861
 ###
 proc ::Direct_UrlRemove prefix {
   global Direct
@@ -47,7 +47,7 @@ proc ::Direct_UrlRemove prefix {
 }
 
 ###
-# topic: c8f7f332-f903-1436-b320-33e6c590a3bf
+# topic: 2982f9c8-445f-661b-9f20-08e75350e0e6
 ###
 proc ::Doc_AddRoot {url fspath} {
   set root [file normalize $fspath]
@@ -62,7 +62,7 @@ proc ::Doc_AddRoot {url fspath} {
 }
 
 ###
-# topic: 1626a2dc-ff5c-5cf7-9162-fb9e1a135b8d
+# topic: 5f47a2ba-e6c9-b47f-5154-78194cd0aad0
 ###
 proc ::Doc_Dynamic args {
   global do_cache
@@ -132,7 +132,7 @@ proc ::wibble::zone::direct_domain state {
 }
 
 ###
-# topic: 7948a04d-12ce-028b-2e68-59e4ddb842bd
+# topic: 2ff37eb2-ce42-20ec-1e39-7020325d46da
 ###
 proc ::wibble::zone::Direct_MarshallArguments {prefix suffix query} {
   set cmd [string trimleft $prefix$suffix /]

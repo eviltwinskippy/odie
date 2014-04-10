@@ -1,0 +1,14 @@
+#!/usr/bin/make
+
+###
+# Project Makefile tailored for a Generic Unix
+###
+
+export LDFLAGS=-lfontconfig
+# Flags to be fed to ./configure
+TCL_CONFIG_FLAGS=
+TK_CONFIG_FLAGS=
+TCL_SHELL=${LOCAL_REPO}/bin/tclsh8.6
+WISH_SHELL=${LOCAL_REPO}/bin/wish8.6
+
+PLATFORM=unix

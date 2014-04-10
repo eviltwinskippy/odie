@@ -1,0 +1,24 @@
+/*
+** This is just a template. Replace with your own
+*/
+#include <tcl.h>
+
+/*
+** Declare INIT functions here
+*/
+
+/*
+** int Vexpr_Init(Tcl_Interp *);
+*/
+
+/*
+** Call initialization code for all extensions
+*/
+int
+Toadkit_Packages_Init(interp)
+    Tcl_Interp *interp;		/* Interpreter for application. */
+{
+/*
+** if(Vexpr_Init(interp)) return TCL_ERROR;
+*/
+}

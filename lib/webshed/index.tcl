@@ -7,7 +7,7 @@ package provide webshed 0.1
 ###
 proc ::webshed::reload {} {
   variable root
-  set loaded index.tcl  
+  set loaded {pkgIndex.tcl index.tcl}  
   foreach file {
     community.tcl
   } {

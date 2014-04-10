@@ -1,0 +1,131 @@
+TCL_FOSSIL_DB=
+TK_FOSSIL_DB=${DOWNLOAD}/tk.fos
+TOADKIT=${LOCAL_REPO}/bin/toadkit_bare${EXE}
+TCLKIT=${LOCAL_REPO}/bin/tclkit_bare${EXE}
+
+${LOCAL_REPO}/lib/tclConfig.sh:
+	echo "missing tclConfig.sh"
+	make tcltk
+        
+${TCL_SHELL}: ${LOCAL_REPO}/lib/tclConfig.sh
+        
+clean:
+	echo Cleaning
+	rm -rf ${LOCAL_REPO}/bin
+	rm -rf ${LOCAL_REPO}/lib
+	rm -rf ${LOCAL_REPO}/lib64
+	rm -rf ${LOCAL_REPO}/doc
+	rm -rf ${LOCAL_REPO}/share
+	rm -rf ${LOCAL_REPO}/var
+	rm -rf ${LOCAL_REPO}/zipdir
+
+install: ${LOCAL_REPO}/lib/tclConfig.sh
+	# Copy out bits we need for the zipdir
+	rm -rf ${LOCAL_REPO}/zipdir/tcl8.6/
+	mkdir -p ${LOCAL_REPO}/zipdir/tcl8.6/
+	cp -a ${LOCAL_REPO}/lib/tcl8.6/* ${LOCAL_REPO}/zipdir/tcl8.6/
+	rm -rf ${LOCAL_REPO}/zipdir/tk8.6/
+	mkdir -p ${LOCAL_REPO}/zipdir/tk8.6/
+	cp -a ${LOCAL_REPO}/lib/tk8.6/* ${LOCAL_REPO}/zipdir/tk8.6/
+	rm -rf ${LOCAL_REPO}/zipdir/tcl8/
+	mkdir -p ${LOCAL_REPO}/zipdir/tcl8/
+	cp -a ${LOCAL_REPO}/lib/tcl8/* ${LOCAL_REPO}/zipdir/tcl8/       
+	${TCL_SHELL} apps/sherpa.tcl install odie tcllib tklib sqlite taolib
+	${TCL_SHELL} apps/sherpa.tcl upgrade odie tcllib tklib sqlite taolib
+
+rebuild:
+	# Copy out bits we need for the zipdir
+	if [ -e "${SANDBOX}/tcl/${PLATFORM}/Makefile" ] ; then  \
+		make -C ${SANDBOX}/tcl/${PLATFORM} distclean; fi
+	if [ -e "${SANDBOX}/tk/${PLATFORM}/Makefile" ] ; then  \
+		make -C ${SANDBOX}/tk/${PLATFORM} distclean ; fi
+	make clean
+	make tcltk
+	make install
+
+skel:
+	mkdir -p ${LOCAL_REPO}
+	mkdir -p ${LOCAL_REPO}/bin
+	mkdir -p ${LOCAL_REPO}/etc
+	mkdir -p ${LOCAL_REPO}/lib
+	mkdir -p ${LOCAL_REPO}/lib64
+	mkdir -p ${LOCAL_REPO}/doc
+	mkdir -p ${LOCAL_REPO}/share
+	mkdir -p ${LOCAL_REPO}/var
+	mkdir -p ${LOCAL_REPO}/zipdir
+	mkdir -p ${DOWNLOAD}
+	mkdir -p ${SANDBOX}
+
+	mkdir -p ${SANDBOX}/tclconfig	
+        # Make sure we have a copy of tclconfig
+	if [ ! -e "${DOWNLOAD}/tclconfig.fos" ] ; then \
+		fossil clone ${ODIEMIRRORURL}/tclconfig ${DOWNLOAD}/tclconfig.fos ; \
+	fi
+	if [ ! -e "${SANDBOX}/tclconfig/.fslckout" ] ; then  \
+		echo "CREATE" ; cd ${SANDBOX}/tclconfig ; fossil open ${DOWNLOAD}/tclconfig.fos ; \
+	fi
+        
+tcltk: skel
+        
+	if [ ! -e "${DOWNLOAD}/tcl.fos" ] ; then \
+		fossil clone ${ODIEMIRRORURL}/tcl ${DOWNLOAD}/tcl.fos ; \
+	fi        
+	if [ ! -e "${SANDBOX}/tcl/${PLATFORM}/Makefile.in" ] ; then  \
+		rm -rf ${SANDBOX}/tcl ; \
+		mkdir -p ${SANDBOX}/tcl ; \
+		echo "Unpacking" ; \
+		cd ${SANDBOX}/tcl ; fossil open ${DOWNLOAD}/tcl.fos ${TCL_VERSION_TAG} ; \
+	fi
+	if [ ! -e "${SANDBOX}/tcl/${PLATFORM}/Makefile" ] ; then  \
+		cd ${SANDBOX}/tcl/${PLATFORM} ; sh ./configure --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib; \
+	fi
+	cd ${SANDBOX}/tcl/${PLATFORM} ; make install
+
+	mkdir -p ${SANDBOX}/tk
+	if [ ! -e "${DOWNLOAD}/tk.fos" ] ; then \
+		fossil clone ${ODIEMIRRORURL}/tk ${DOWNLOAD}/tk.fos ; \
+	fi  
+	if [ ! -e "${SANDBOX}/tk/.fslckout" ] ; then  \
+		echo "CREATE" ; cd ${SANDBOX}/tk ; fossil open ${DOWNLOAD}/tk.fos ${TCL_VERSION_TAG} ; \
+	fi
+	if [ ! -e "${SANDBOX}/tk/${PLATFORM}/Makefile" ] ; then  \
+		cd ${SANDBOX}/tk/${PLATFORM} ; sh ./configure --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib ${TK_CONFIG_FLAGS}; \
+	fi
+	cd ${SANDBOX}/tk/${PLATFORM} ; make install
+
+tcltk-static: skel
+        
+	if [ ! -e "${DOWNLOAD}/tcl.fos" ] ; then \
+		fossil clone ${ODIEMIRRORURL}/tcl ${DOWNLOAD}/tcl.fos ; \
+	fi        
+	if [ ! -e "${SANDBOX}/tcl-static/${PLATFORM}/Makefile.in" ] ; then  \
+		rm -rf ${SANDBOX}/tcl-static ; \
+		mkdir -p ${SANDBOX}/tcl-static ; \
+		echo "Unpacking" ; \
+		cd ${SANDBOX}/tcl-static ; fossil open ${DOWNLOAD}/tcl.fos ${TCL_VERSION_TAG} ; \
+	fi
+	if [ ! -e "${SANDBOX}/tcl-static/${PLATFORM}/Makefile" ] ; then  \
+		cd ${SANDBOX}/tcl-static/${PLATFORM} ; sh ./configure --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib --with-tzdata --enable-shared=no; \
+	fi
+	cd ${SANDBOX}/tcl-static/${PLATFORM} ; make all
+
+	mkdir -p ${SANDBOX}/tk-static
+	if [ ! -e "${DOWNLOAD}/tk.fos" ] ; then \
+		fossil clone ${ODIEMIRRORURL}/tk ${DOWNLOAD}/tk.fos ; \
+	fi  
+	if [ ! -e "${SANDBOX}/tk-static/.fslckout" ] ; then  \
+		echo "CREATE" ; cd ${SANDBOX}/tk-static ; fossil open ${DOWNLOAD}/tk.fos ${TCL_VERSION_TAG} ; \
+	fi
+	if [ ! -e "${SANDBOX}/tk-static/${PLATFORM}/Makefile" ] ; then  \
+		cd ${SANDBOX}/tk-static/${PLATFORM} ; sh ./configure --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib ${TK_CONFIG_FLAGS} --enable-xft=no --enable-xss=no--enable-shared=no; \
+	fi
+	cd ${SANDBOX}/tk-static/${PLATFORM} ; make all
+
+toadkit: tcltk-static
+	${TCL_SHELL} apps/sherpa.tcl install toadkit tclkit
+
+${TOADKIT}: tcltk-static
+	${TCL_SHELL} apps/sherpa.tcl install toadkit
+        
+${TCLKIT}: tcltk-static
+	${TCL_SHELL} apps/sherpa.tcl install tclkit

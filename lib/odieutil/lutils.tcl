@@ -8,12 +8,6 @@
 #   
 ### END COPYRIGHT BLURB
 
-#package require md5
-
-#
-#
-#
-
 package provide listutil 1.6
 
 proc ::tcl::mathfunc::pi {} [list return [expr 4.0*atan(1.0)]]
@@ -248,15 +242,15 @@ makeproc lutil {command varname args} {
 }
 
 makeproc ldelete {varname args} {
-    upvar 1 $varname var
-    if ![info exists var] {
-        return
+  upvar 1 $varname var
+  if ![info exists var] {
+      return
+  }
+  foreach item [lsort -unique $args] {
+    while {[set i [lsearch $var $item]]>=0} {
+      set var [lreplace $var $i $i]
     }
-    foreach item $args {
-        set i [lsearch $var $item]
-        if { $i < 0 } continue
-        set var [lreplace [K $var [set var {}]] $i $i]
-    }
+  }
 }
 
 makeproc ladd {varname args} {
@@ -351,47 +345,6 @@ makeproc dictget {dict field} {
     if [dict exists $dict $field] {
         return [dict get $dict $field]
     }
-}
-makeproc ddefault {dictvar data} { 
-    upvar 1 $dictvar dict
-    if ![info exists dict] {
-        set dict $data
-        return
-    }
-    set dict [dict merge $data $dict]
-}
-
-makeproc sqllike_to_regexp pat {
-
-    set newpat [string trim $pat %]
-
-    regsub -all % $newpat .* newpat
-    regsub -all _ $newpat . newpat
-
-    if { [string index $pat 0] != "%" } {
-        set newpat ^${newpat}
-    }
-
-    if { [string index $pat end] != "%" } { 
-        set newpat ${newpat}\$
-    }
-    return $newpat
-}
-
-makeproc regexp_to_sqllike pat {
-    set newpat [string trimleft $pat ^]
-    set newpat [string trimright $newpat \$]
-
-    regsub -all {\.\*} $newpat % newpat
-    regsub -all {\.} $newpat _ newpat
-
-    if { [string index $pat 0] != "^" } {
-        set newpat %${newpat}
-    }
-    if { [string index $pat end]  != "\$" } { 
-        append newpat %
-    }
-    return $newpat
 }
 
 makeproc pop {stackvar resultvar} {

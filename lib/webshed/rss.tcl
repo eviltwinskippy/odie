@@ -1,7 +1,7 @@
 ::namespace eval ::rss {}
 
 ###
-# topic: eb57650a-5ee3-cf1f-c2f4-5ae59c6302ac
+# topic: 4b0197bb-f2e6-f849-2db1-f92c6e1bddf1
 ###
 proc ::nodeToEntry nodeid {
    set dat [wiki nodeGet $nodeid]
@@ -19,7 +19,7 @@ proc ::nodeToEntry nodeid {
 }
 
 ###
-# topic: 18864a13-c902-7674-f97b-62ef6d59b10c
+# topic: dfbd15ee-897f-a9d1-e927-a7fc0b39e47e
 ###
 proc ::rss::dateStamp time {
    if { $time == {} } { 

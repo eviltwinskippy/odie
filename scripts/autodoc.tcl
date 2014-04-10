@@ -7,9 +7,10 @@
 ###
 package require md5
 package require sqlite3
+package require tao-sqlite
 
-set base [file normalize [file join [file dirname [info script]] ..]]
-source [file join $base lib odie index.tcl]
+#set base [file normalize [file join [file dirname [info script]] ..]]
+set base [pwd]
 
 ###
 # Build a database file

@@ -11,13 +11,6 @@ set package_files {}
 set stack {}
 set fout [open [file join $base pkgIndex.tcl] w]
 set result [::codebale::sniffPath $base stack]
-#foreach directory [glob [file join $base *]] {
-#  if {[file isdirectory $directory]} {
-#    puts $directory
-#    set result [::codebale::sniffPath $directory stack]
-#  }
-#}
-# [lindex $argv 0]
 
 while {[llength $stack]} {
   set stackpath [lindex $stack 0]

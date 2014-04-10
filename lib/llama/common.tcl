@@ -5,7 +5,7 @@
 ::namespace eval ::llama {}
 
 ###
-# topic: 9fbc7534-0dd6-57b8-1d38-942fa81dbed7
+# topic: 8a28a5f2-c83c-178d-3484-dcfd23934187
 # title: Sizes a combobox to fit widest element
 ###
 proc ::llama::comboWidth values {

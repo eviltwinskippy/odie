@@ -4,7 +4,7 @@
 # This file defines routines used to bundle and manage Tcl and C
 # code repositories
 #
-# Copyright (c) 2012 Sean Woods
+# Copyright (c) 2014 Sean Woods
 #
 # See the file "license.terms" for information on usage and redistribution of
 # this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -100,6 +100,61 @@ proc ::codebale::canonical alias {
   return $alias
 }
 
+
+
+set col 0
+proc ::codebale::cases_put {f x} {
+  global col
+  if {$col==0} {puts -nonewline $f "   "}
+  if {$col<2} {
+    puts -nonewline $f [format " %-21s" $x]
+    incr col
+  } else {
+    puts $f $x
+    set col 0
+  }
+}
+
+proc ::codebale::cases_finalize {f} {
+  global col
+  if {$col>0} {puts $f {}}
+  set col 0
+}
+
+proc ::codebale::cases_generate {prefix cases} {
+  global col
+  set col 0
+  set f [open [file join $::project(path) build [string tolower ${prefix}_cases].h] w]
+  puts $f $::project(standard_header)
+  puts $f "  const static char *${prefix}_strs\[\] = \173"
+  set lx [lsort -dictionary $cases]
+  foreach item $lx {
+    cases_put $f \"[string tolower $item]\",
+  }
+  cases_put $f 0
+  cases_finalize $f
+  puts $f "  \175;"
+  puts $f "  enum ${prefix}_enum \173"
+  foreach name $lx {
+    regsub -all {@} $name {} name
+    cases_put $f ${prefix}_[string toupper $name],
+  }
+  cases_finalize $f
+  puts $f "  \175;"
+  puts $f "\
+  int index;
+  if( objc<2 ){
+    Tcl_WrongNumArgs(interp, 1, objv, \"METHOD ?ARG ...?\");
+    return TCL_ERROR;
+  }
+  if( Tcl_GetIndexFromObj(interp, objv\[1\], ${prefix}_strs,\
+            \"option\", 0, &index)){
+    return TCL_ERROR;
+  }
+  switch( (enum ${prefix}_enum)index )"
+  close $f
+}
+
 ###
 # topic: 547fa005-7139-46cd-8f2c-395a28f9353c
 ###
@@ -125,6 +180,78 @@ proc ::codebale::complete_ccomment string {
     incr closed
   }
   if { $opened > $closed } {
+    return 0
+  }
+  return 1
+}
+
+
+###
+# description:
+# Needed because there are cases where a C line is complete and valid
+# in ways that info complete will not detect
+###
+proc ::codebale::complete_cstatement {line {trace 0}} {
+  # Easy out see if Tcl likes it
+  if {[info complete $line]} {
+    return 1
+  }
+  set n [string length $line]
+  set dquotes   0
+  set squote   0
+
+  set paren    0
+  set bracket   0
+  set j 0
+
+  for {set i 0} {$i < $n} {incr i} {
+    if {[string index $line [expr {$i-1}]] eq "\x5c"} continue
+    switch [string index $line $i] {
+      / {
+        ###
+        # Ignore the contents of comments and return incomplete
+        # if a comment is started on this line but not terminated
+        ###
+        if {[string index $line [expr {$i+1}]] eq "*"} {
+          set endcomment [string first "*/" $line $i]
+          if { $endcomment >= 0 } {
+            set i [expr {$endcomment+2}]
+            continue
+          } else {
+            return 0
+          }
+        }
+      }
+      \x27 {
+        # Single quotes can't embed anything else
+        # but they can have several encodings
+        set next [string first \x27 $line [expr {$i+1}]]
+        if { $next < 0} {
+          return 1
+        }
+        set i $next
+      }
+      \x22 {
+        incr dquotes
+      }
+      \x28 {
+        incr paren
+      }
+      \x29 {
+        incr paren -1
+      }
+      \x7B {
+        incr bracket
+      }
+      \x7D {
+        incr bracket -1
+      }
+    }
+  }
+  if {$dquotes % 2 || $paren || $bracket} {
+    if {$trace} {
+      puts [list $dquotes $paren $bracket]
+    }
     return 0
   }
   return 1
@@ -237,6 +364,7 @@ proc ::codebale::digest_csource {dat {trace 0}} {
   set thisline {}
   set rawblock {}
   set continueline 0
+  set inknrdef 0
   set infunct 0
   set isfunct 0
   set inparen 0
@@ -244,6 +372,7 @@ proc ::codebale::digest_csource {dat {trace 0}} {
   set instruct 0
   set psplit 0
   set incomment 0
+  set instatement 0
   set parseline {}
   set thisfunct {}
   set priorcomment {}
@@ -258,8 +387,13 @@ proc ::codebale::digest_csource {dat {trace 0}} {
     set ::readingline $rawline
     append rawblock $rawline \n
     set wasincomment $incomment
+    
+    if {[regexp {^ *case *([A-Z]+)_([A-Z0-9_]+):} $rawline all prefix label]} {
+      lappend cases($prefix) $label
+    }
+    
     regsub -all \x7b $rawline \x20\x7b line
-    if { $trace } {puts "$continueline $infunct $inparen $incomment [string length $priorcomment] | $line"}
+    if { $trace } {puts "$continueline $instatement $infunct $inparen $incomment [string length $priorcomment] | $line"}
     if {$incomment} {
       append thisline \n [string trim $line]
       if {[string first "*/" $thisline] <0} continue
@@ -269,18 +403,44 @@ proc ::codebale::digest_csource {dat {trace 0}} {
     } elseif {$inparen} {
       set funcname {} 
       append thisline \n "  [string trim $line]"
+      set parenidx [string first ")" $thisline]
+      set lastchar [string index [string trim $thisline] end] 
+      if {$trace} { puts [list $parenidx $lastchar] }
       ###
       # Wait for the trailing parenthesis and starting curly
       ###
-      if {[set idx [string first ")" $thisline]] < 0} continue
-      if {[string index $parseline end] ne "\;" } {
+      if {$parenidx < 0} continue
+      if {$lastchar ne "\;" } {
         if {[string first "\{" $thisline $idx] < 0} continue
       }        
       set psplit 1
-      set inparen 0    
+      set inparen 0
+    } elseif {$instatement} {
+      append thisline \n [string trim $line]
+      if {[complete_cstatement $thisline]} {
+        if { $trace } { puts "ENDOFSTATEMENT" }
+        set rawblock {}
+        set infunct 0
+        set isfunct 0
+        set instatement 0
+        if { [string match "*const*Tcl_ObjType*=*" $thisline] } {
+          set pline [string range $thisline 0 [string first "=" $thisline]-1]
+          if { $trace } {puts "TCL OBJ TYPE DECLARED $pline "}
+          dict lappend result objtypes_defined [lindex $pline end]
+        }
+        if { [string match "*const*Tk_PhotoImageFormat*=*" $thisline] } {
+          set pline [string range $thisline 0 [string first "=" $thisline]-1]
+          if { $trace } {puts "TCL PHOTO TYPE DECLARED $pline "}
+          dict lappend result phototypes_defined [lindex $pline end]
+        }
+        set thisline {}
+        continue
+      } else {
+        continue
+      }    
     } elseif {$infunct} {
       append thisline \n [string trim $line]
-      if {[info complete $thisline]} {
+      if {[complete_cstatement $thisline $trace]} {
         if { $trace } { puts "ENDOFFUNCTION" }
         if { $thisfunct ne {} } {
           dict set result function $thisfunct body $rawblock
@@ -308,7 +468,7 @@ proc ::codebale::digest_csource {dat {trace 0}} {
         set comment 1
         continue
       }
-    } elseif {[string first "(" $thisline] > 0} {
+    } elseif {[set idx [string first "(" $thisline]] > 0} {
       if {[string first ")" $thisline] < 0} {
         set inparen 1
         continue
@@ -358,6 +518,10 @@ proc ::codebale::digest_csource {dat {trace 0}} {
       set isfunct 0
       set continueline 0
     } elseif { $isfunct == 0 } {
+      if {![complete_cstatement $thisline]} {
+        set instatement 1
+        continue
+      }
       if {![regexp (void|unsigned|static|int|char|inline|extern) $thisline]} {
         if { $trace } { puts "!KEYWORDS" }
         dict append result code "$rawblock"
@@ -383,6 +547,9 @@ proc ::codebale::digest_csource {dat {trace 0}} {
   }
   if { $infunct } {
     error "Stopped waiting for end of function $thisfunct"
+  }
+  if {[info exists cases]} {
+    dict set result cases [array get cases]
   }
   return $result
 }
@@ -1083,6 +1250,80 @@ proc ::codebale::pattern_match {patterns parseline} {
   return {}
 }
 
+proc ::codebale::pkg_mkIndex base {
+  set stack {}
+  if {[file exists [file join $base pkgIndex.tcl]]} {
+    return
+    #file delete [file join $base pkgIndex.tcl]
+  }
+  set fout [open [file join $base pkgIndex.tcl.new] w]
+  set result [::codebale::sniffPath $base stack]
+  
+  puts $fout {# Tcl package index file, version 1.1
+# This file is generated by the "pkg_mkIndex" command
+# and sourced either when an application starts up or
+# by a "package unknown" script.  It invokes the
+# "package ifneeded" command to set up package-related
+# information so that packages will be loaded automatically
+# in response to "package require" commands.  When this
+# script is sourced, the variable $dir must contain the
+# full path name of this file's directory.
+  }
+  
+  while {[llength $stack]} {
+    set stackpath [lindex $stack 0]
+    set stack [lrange $stack 1 end]
+    foreach {type file} [::codebale::sniffPath $stackpath stack] { 
+      lappend result $type $file
+    }
+  }
+  set i [string length $base]
+  foreach {type file} $result {
+      switch $type {
+          module {
+              set fname [file rootname [file tail $file]]
+              set package [lindex [split $fname -] 0]
+              set version [lindex [split $fname -] 1]
+              set dir [string trimleft [string range [file dirname $file] $i end] /]
+              puts $fout "package ifneeded $package $version \[list source \[file join \$dir $dir [file tail $file]\]\]"
+              #::codebale::read_tclsourcefile $file
+          }
+          source {
+              if { $file == "$base/pkgIndex.tcl" } continue
+              if { $file == "$base/packages.tcl" } continue
+              if { $file == "$base/main.tcl" } continue
+              if { [file tail $file] == "version_info.tcl" } continue
+              set fin [open $file r]
+              set dat [read $fin]
+              close $fin
+              if {[regexp "package provide" $dat]} {
+                 set fname [file rootname [file tail $file]]
+  
+                 set dir [string trimleft [string range [file dirname $file] $i end] /]
+              
+                 foreach line [split $dat \n] {
+                    set line [string trim $line]
+                    
+                    if { [string range $line 0 14] != "package provide" } continue
+                    set package [lindex $line 2]
+                    set version [lindex $line 3]
+                    if { $dir eq {} } {
+                      puts $fout "package ifneeded $package $version \[list source \[file join \$dir [file tail $file]\]\]"                      
+                    } else {
+                      puts $fout "package ifneeded $package $version \[list source \[file join \$dir $dir [file tail $file]\]\]"
+                    }
+                    break
+                 }
+              }
+              #::codebale::read_tclsourcefile $file
+          }
+      }
+  }
+  close $fout
+  file rename -force [file join $base pkgIndex.tcl.new] [file join $base pkgIndex.tcl]
+}
+
+
 ###
 # topic: 929629f0-ebaa-5547-10f6-6410dfa51f8a
 ###
@@ -1309,7 +1550,7 @@ proc ::codebale::rewrite_comment {spaces topic info} {
 }
 
 ###
-# topic: d8ef9620-b068-3a82-3761-1725abc83192
+# topic: 003ce0c0-d69b-7407-6e84-33492deac920
 # description:
 #    Descends into a directory structure, returning
 #    a list of items found in the form of:
@@ -1327,6 +1568,9 @@ proc ::codebale::sniffPath {spath stackvar} {
       }
       .tcl {
         return [list source $spath]
+      }
+      .h {
+        return [list cheader $spath]
       }
       .c {
         return [list csource $spath]
@@ -1378,6 +1622,51 @@ proc ::codebale::strip_ccoments string {
     incr idx 2
   }
   append result [string range $string $idx end]
+}
+
+proc ::codebale::first_autoconf_token line {
+  set line [string trim $line]
+  set idx [string first "(" $line]
+  if { $idx < 0 } {
+    return {}
+  }
+  return [string range $line 0 $idx-1]
+}
+
+proc ::codebale::rewrite_autoconf {} {
+  ###
+  # Update the AC_INIT line in configure.in
+  ###
+  set fout [open [file join $::project(path) configure.in.new] w]
+  set fin  [open [file join $::project(path) configure.in] r]
+  set wrote_sources 0
+  
+  while {[gets $fin line]>=0} {
+    switch [first_autoconf_token $line] {
+      "AC_INIT" {
+        puts $fout "AC_INIT(\[$::project(pkgname)\], \[$::project(pkgvers)\])"        
+      }
+      "m4_include" -
+      "TEA_ADD_HEADERS" -
+      "TEA_ADD_SOURCES" {
+        if { !$wrote_sources } {
+puts $fout "TEA_ADD_HEADERS(\[generic/${::project(h_file)}\])"
+#puts $fout "TEA_ADD_SOURCES(\[generic/${project(c_file)}\])"
+set wrote_sources 1
+        foreach file $::project(tcl_sources) {
+          puts $fout "TEA_ADD_TCL_SOURCES(\[$file\])"
+        }
+        }
+      }
+      default {
+        puts $fout $line
+      }
+    }
+  }
+
+  close $fin
+  close $fout
+  file rename -force [file join $::project(path) configure.in.new] [file join $::project(path) configure.in]
 }
 
 set ::force_check 0

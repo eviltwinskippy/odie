@@ -1,0 +1,15 @@
+#!/usr/bin/make
+
+###
+# Project Makefile tailored for windows
+###
+EXE=.exe
+
+# Flag passed to configure
+# Given in the makefile: --prefix=${LOCAL_REPO} --libdir=${LOCAL_REPO}/lib
+TCL_CONFIG_FLAGS=
+TK_CONFIG_FLAGS=
+export TCL_SHELL=${LOCAL_REPO}/bin/tclsh86.exe
+export WISH_SHELL=${LOCAL_REPO}/bin/wish86.exe
+
+PLATFORM=win

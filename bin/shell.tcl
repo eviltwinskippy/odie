@@ -1,6 +1,6 @@
 #!/bin/sh
 # \
-exec /usr/local/bin/wish8.5 "$0" ${1+"$@"}
+exec wish "$0" ${1+"$@"}
 
 source /opt/local/odie/init.tcl
 package require tkcon

@@ -5,6 +5,7 @@ package provide llama 0.1
 ###
 set loaded [file normalize [info script]]
 set path [file dirname $loaded]
+lappend loaded [file join $path pkgIndex.tcl]
 
 ###
 # Drop in files that need to be loaded into

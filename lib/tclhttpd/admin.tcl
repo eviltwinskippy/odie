@@ -17,7 +17,7 @@ package require httpd::redirect	;# Redirect_Url
 #package require httpd::utils	;# file
 
 ###
-# topic: f8d508a1-b658-812c-8fe5-3eb01a9432a4
+# topic: 9abf55e3-b99b-f403-5844-7e2b7c0415ae
 ###
 proc ::Admin/redirect {old new} {
     global Doc Httpd
@@ -59,7 +59,7 @@ proc ::Admin/redirect {old new} {
 }
 
 ###
-# topic: ed09a167-f1ab-e96b-5666-50bcc60f3ec9
+# topic: 453881a0-8440-f5d5-c590-7602dc5c1361
 ###
 proc ::Admin/reset/counter name {
     
@@ -79,7 +79,7 @@ if {0} {
 }
 
 ###
-# topic: 037f82b0-bea0-b8e0-812e-6c157141b942
+# topic: 7bbc1cd9-70f4-87a9-423f-8fa3787be7e6
 ###
 proc ::Admin_Url dir {
     Direct_Url $dir Admin

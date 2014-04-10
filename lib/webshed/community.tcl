@@ -22,7 +22,7 @@ proc ::community::/user uid {
 }
 
 ###
-# topic: 04882e39-8837-3259-3668-76b411e167f2
+# topic: 2915e0f9-6abd-985c-2ee6-307af4b194b6
 ###
 proc ::community::accessTypes {} {
   variable aclSqlObj
@@ -34,14 +34,14 @@ proc ::community::accessTypes {} {
 }
 
 ###
-# topic: da5e2bb7-bd9f-e334-4df3-4b27bfb478eb
+# topic: 28ad655f-df3c-67ad-2d35-2cb6d80d5dd8
 ###
 proc ::community::aclBaseRights {} {
   return admin
 }
 
 ###
-# topic: bce98182-37ac-10c7-fc27-e5ed33518bc1
+# topic: 41bf2471-4ce2-01cc-c1df-8774c6485462
 ###
 proc ::community::aclCacheBuild {aclname userid} {
   variable aclSqlObj
@@ -89,7 +89,7 @@ acl_name='$p' and \
 }
 
 ###
-# topic: 1aae1d43-c949-31ac-5c54-16fcac0bd35b
+# topic: da8f27fa-4c15-7ae1-b2f5-195352ac2f0b
 ###
 proc ::community::aclCacheCheck {aclname userid resultvar} {
    upvar 1 $resultvar rights
@@ -104,7 +104,7 @@ proc ::community::aclCacheCheck {aclname userid resultvar} {
 }
 
 ###
-# topic: b35f18b4-4bb6-d972-f79e-eb0d8ecf84ae
+# topic: a74ce78f-686c-157e-4c51-a6755232a3ae
 ###
 proc ::community::aclCacheSave {aclname userid rights} {
   variable aclSqlObj
@@ -112,7 +112,7 @@ proc ::community::aclCacheSave {aclname userid rights} {
 }
 
 ###
-# topic: 10eb6d68-0cc3-808b-18a9-472bfcf194e5
+# topic: dcfdf24c-7ad0-d190-fc78-4cdbe2835414
 ###
 proc ::community::aclContainerRegister object { 
   variable acl_container_list
@@ -133,7 +133,7 @@ proc ::community::aclContainerRegister object {
 }
 
 ###
-# topic: ce0ce549-cf20-023b-f470-94eeb49d7470
+# topic: 98c97d72-5cc4-6eb1-7e40-815058997762
 ###
 proc ::community::aclCreate {aclname parent} {
   variable aclSqlObj
@@ -144,7 +144,7 @@ proc ::community::aclCreate {aclname parent} {
 }
 
 ###
-# topic: 04598e75-4d11-f223-013d-0020af927bf8
+# topic: 53808543-9e47-5150-2392-70758dfae05f
 ###
 proc ::community::aclDeleteRule id {
   variable aclSqlObj
@@ -153,7 +153,7 @@ proc ::community::aclDeleteRule id {
 }
 
 ###
-# topic: e091bb77-b690-dcfa-25a4-875d3822922c
+# topic: a577835a-4f89-3dce-48fd-371ec9655b4a
 ###
 proc ::community::aclDeny {aclname userid right} {
   variable aclSqlObj
@@ -163,7 +163,7 @@ proc ::community::aclDeny {aclname userid right} {
 }
 
 ###
-# topic: 42ff5cff-5107-db9c-3215-6c2e26720e92
+# topic: f692cf5e-1e0e-a08b-1766-e5de04e7df19
 ###
 proc ::community::aclGrant {aclname ruserid right} {
   variable aclSqlObj
@@ -173,7 +173,7 @@ proc ::community::aclGrant {aclname ruserid right} {
 }
 
 ###
-# topic: 72f71e49-cc88-992d-3ed9-ce393d0dd34c
+# topic: 7b9db6ab-e395-3d8b-a999-2915a4606971
 ###
 proc ::community::aclList {} {
   variable aclSqlObj
@@ -181,14 +181,14 @@ proc ::community::aclList {} {
 }
 
 ###
-# topic: 69e5fb2a-0f61-c3cc-8f43-5279e6f212bf
+# topic: ba23f359-c00c-69de-7035-f421dd8d905f
 ###
 proc ::community::aclLoad filename {
   source $filename
 }
 
 ###
-# topic: ad00c790-b8c5-b2d2-1127-ae8aac60b857
+# topic: 86aa4cba-c2a1-832c-39d4-4d31b603ab07
 ###
 proc ::community::aclNode {aclname node} {
   variable aclSqlObj
@@ -197,7 +197,7 @@ proc ::community::aclNode {aclname node} {
 }
 
 ###
-# topic: d48d621f-bfdd-d658-c808-a70268924103
+# topic: 8001755b-3b8d-22f9-4c9b-87ab22a94d02
 ###
 proc ::community::aclParent aclname {
   variable aclSqlObj
@@ -205,7 +205,7 @@ proc ::community::aclParent aclname {
 }
 
 ###
-# topic: ba11bf22-5b2e-b424-2cc8-4db989434ec3
+# topic: 4d3bb3b5-ac7b-5166-edc1-1d707ed87839
 ###
 proc ::community::aclRevoke {aclname userid right} {
   variable aclSqlObj
@@ -220,7 +220,7 @@ proc ::community::aclRevoke {aclname userid right} {
 }
 
 ###
-# topic: 78e27e97-86e6-b48f-5887-ca422971a5c8
+# topic: 0c1df040-7f2b-d109-a502-5d8920e6d40e
 ###
 proc ::community::aclRights {aclname userid {right {}}} {
   ### The way it outta work
@@ -246,7 +246,7 @@ proc ::community::aclRights {aclname userid {right {}}} {
 }
 
 ###
-# topic: 639ddb42-e3d4-082f-c13c-2171a7cef5ea
+# topic: 6058b2df-a6a7-85d4-26ac-f8c92e0d2060
 ###
 proc ::community::aclRules aclname {
   variable aclSqlObj
@@ -255,7 +255,7 @@ acl_grants where acl_name='$aclname' order by node_id"]
 }
 
 ###
-# topic: 2673aa3f-023b-9b2a-9d8d-cf4d1f7c1176
+# topic: a708fcd3-0c75-0c4b-aaf1-144e999cce9e
 ###
 proc ::community::aclSave filename {
   variable aclSqlObj
@@ -285,7 +285,7 @@ order by parent,acl_name"] {
 }
 
 ###
-# topic: 1d45eac1-3acd-f309-1fae-78ca7e1059ce
+# topic: 5504fea3-e813-e8e1-0bad-a6cd81c035bd
 ###
 proc ::community::aclSetParent {aclname newparent} {
   variable aclSqlObj
@@ -294,14 +294,14 @@ proc ::community::aclSetParent {aclname newparent} {
 }
 
 ###
-# topic: ad4306ca-aa4f-7cee-9159-9bf652c20dcc
+# topic: 46a0e9f1-b92a-8578-2d9f-388f041b1ad1
 ###
 proc ::community::aclWheelMode {} {
   return 1
 }
 
 ###
-# topic: 7510caf9-4f02-bfb8-f89f-b42c53700593
+# topic: fe01c519-6627-4ce6-f453-5e7e8a784639
 ###
 proc ::community::Anonymous {} {
   if { [CurrentUser] in {anonymous nobody {} 99} } {
@@ -311,7 +311,7 @@ proc ::community::Anonymous {} {
 }
 
 ###
-# topic: bab8e0f0-866a-2ce1-64d6-4a4a9a4f0295
+# topic: de2ace7e-6173-bf58-f878-f47501c4dc70
 ###
 proc ::community::AnonymousUser {{prohibit_anon 0}} {
   set sesid [get ::session(sesid)]
@@ -328,7 +328,7 @@ proc ::community::AnonymousUser {{prohibit_anon 0}} {
 }
 
 ###
-# topic: 7f75e21b-71cf-e040-6baf-ecd8a28dc405
+# topic: 129b0307-5931-ba31-f2d3-797ef22e89d1
 ###
 proc ::community::Authenticate {username password} {
   set cleartext [db one {select password from users where username=$username limit 1}]
@@ -360,7 +360,7 @@ proc ::community::cget field {
 }
 
 ###
-# topic: cd7d763b-25d5-edb2-1080-082a20636eaf
+# topic: 7af1ae3d-8420-e01e-730d-0e9e750aa24e
 ###
 proc ::community::CookiesCreate {{remember 0}} {
   variable expire
@@ -404,7 +404,7 @@ proc ::community::CookiesCreate {{remember 0}} {
 }
 
 ###
-# topic: 808ff4a2-402c-1f17-9434-b9f8e8954871
+# topic: fe64e676-9fd2-48e5-ab5d-4df1594c29fc
 ###
 proc ::community::CookiesDestroy {} { 
   global env
@@ -417,7 +417,7 @@ proc ::community::CookiesDestroy {} {
 }
 
 ###
-# topic: f734a993-cb7b-64d0-01dd-ec25573827a7
+# topic: 9a48c2f9-fb2c-4523-2ad7-371994ddeac0
 # description:
 #    Returns a session ID number from a cookie
 #    
@@ -471,7 +471,7 @@ proc ::community::get_sesid keyval {
 }
 
 ###
-# topic: 51b7f83e-9dbe-5213-12ea-aa2546dce2be
+# topic: 7d40853a-024b-0daf-076b-c84040944203
 ###
 proc ::community::GlobalLinks {} {
   
@@ -485,14 +485,14 @@ proc ::community::homepage {} {
 }
 
 ###
-# topic: 730ef67f-6a55-62c9-397d-7e9867336228
+# topic: 5845b96b-5e4a-e1fb-c90d-efecc7a620dd
 ###
 proc ::community::homeUrl {} {
   return /home
 }
 
 ###
-# topic: 616868c7-2474-8cc1-59d3-268e2d6e4d66
+# topic: ba57c2fe-e317-2166-568d-1426e809b6d1
 ###
 proc ::community::LocalHost {} { 
   if { [lindex [split [::taourl::request_get host] :] 0] == "localhost" } {
@@ -502,7 +502,7 @@ proc ::community::LocalHost {} {
 }
 
 ###
-# topic: ddc9d7b4-c01c-58ee-7556-ec4e368a08f7
+# topic: 9b6bd662-283e-cb20-79ef-6e5f50b11c9e
 ###
 proc ::community::loginPage {{message {}}} {
   ::page title "Please Log In"
@@ -512,17 +512,17 @@ proc ::community::loginPage {{message {}}} {
 }
 
 ###
-# topic: ea285341-42b1-d3f3-f0d8-a6ad5bfe4098
+# topic: 75b6e239-d9f8-0593-99e5-da0abee8a1dc
 ###
 proc ::community::menuMethods args {}
 
 ###
-# topic: 7490f13f-7837-e3ea-7147-577bf00225b7
+# topic: 04d953ac-5a03-7839-688c-64b72dc4c273
 ###
 proc ::community::menuNavigation args {}
 
 ###
-# topic: 6e5d21e6-b0de-28cd-d65b-7542357186f1
+# topic: 66301c91-1a2e-b02c-8e65-5c58800348e1
 ###
 proc ::community::nodeAcl node {
   if { [set aclnode [db one {select acl_name from acl_node_cache where node_id=$node}] != {} } {
@@ -561,7 +561,7 @@ proc ::community::poke args {
 }
 
 ###
-# topic: 68a3e6c4-baca-1ec1-99ed-7cf7868e0104
+# topic: 6cb8347a-9741-cc27-799f-cebbc87be23d
 ###
 proc ::community::prefsLoad args { 
   ::page::colors
@@ -794,7 +794,7 @@ proc ::community::session_validate {sesid {varname {}}} {
 }
 
 ###
-# topic: 9c6a73a5-eb12-f745-86a0-4601d6c1157e
+# topic: 663e9c98-8db2-e0aa-1977-c6cfed7da54e
 ###
 proc ::community::SessionBuild {{username {}}} { 
   global session
@@ -812,7 +812,7 @@ proc ::community::SessionBuild {{username {}}} {
 }
 
 ###
-# topic: 04438e14-adf6-9169-42b3-64c6cde8a21d
+# topic: fdbe3629-ab32-be24-8ab4-9b4ba3187d07
 ###
 proc ::community::SessionLoad {} {
   set session_id {}
@@ -835,7 +835,7 @@ proc ::community::SessionLoad {} {
 }
 
 ###
-# topic: a2cabf5c-493c-24c5-ee25-dc1e6bad27a2
+# topic: 183b00ce-f25b-c213-fd82-1a171f9f0d4b
 ###
 proc ::community::Uid username {
   set user [lindex [split $username -] end]
@@ -844,7 +844,7 @@ proc ::community::Uid username {
 }
 
 ###
-# topic: 7decfdcd-6bf3-3b3a-5fd7-deff5fa79000
+# topic: 8b283f31-04e3-bab8-b185-69782b7b287c
 ###
 proc ::community::urlPostlim {} {
    set ::errorFlag([get ::session(userid)]) 0
@@ -852,7 +852,7 @@ proc ::community::urlPostlim {} {
 }
 
 ###
-# topic: 728e8d3a-2444-17ac-ac23-a2b4bf166f7a
+# topic: 57204247-8833-81ce-9356-be7fd79f36ba
 ###
 proc ::community::urlPrelim {{object {}} {aclcheck {}}} {
   ###
@@ -896,7 +896,7 @@ proc ::community::urlPrelim {{object {}} {aclcheck {}}} {
 }
 
 ###
-# topic: 73501c8b-62c1-c40c-59b3-cf622a8bdcb8
+# topic: 355481a3-4b17-0673-effa-876e43e81586
 ###
 proc ::community::UserFullName user {
   set user [lindex [split $username -] end]
@@ -904,7 +904,7 @@ proc ::community::UserFullName user {
 }
 
 ###
-# topic: fd2d1f5f-8b70-76ba-6815-04c4a6290474
+# topic: af281d55-2f32-da73-2382-dcabd915cf76
 ###
 proc ::community::UserIsMember {group userid} {
   if { $userid == "anonymous" } { return 0 }
@@ -915,7 +915,7 @@ proc ::community::UserIsMember {group userid} {
 }
 
 ###
-# topic: a941faf9-0261-9b3f-9948-6e14bb566457
+# topic: c87deda7-1c87-7ef4-7f83-05b70475a6b2
 ###
 proc ::community::UserMap {username {altstring {}}} {
   set username [db one {select username from users where uid=$username OR username=$username or email=$username limit 1}]            
@@ -923,7 +923,7 @@ proc ::community::UserMap {username {altstring {}}} {
 }
 
 ###
-# topic: b50f1e78-2378-c9cc-a602-56649be09e14
+# topic: a9058f79-9077-9766-e47d-a3c7e1f5d6d3
 ###
 proc ::community::UserName user {
   set user [lindex [split $username -] end]
@@ -932,7 +932,7 @@ proc ::community::UserName user {
 }
 
 ###
-# topic: 616804ee-5d4d-899d-c41c-060ae4df4055
+# topic: 6e74a813-c5ff-9655-7fb0-6d76f409184e
 ###
 proc ::community::UserType username {
   set username [db eval {select type from users where uid=$username OR username=$username or email=$username limit 1}]
@@ -940,7 +940,7 @@ proc ::community::UserType username {
 }
 
 ###
-# topic: c8f2a75e-5cbd-9912-ee94-39d371488b0c
+# topic: c6af2982-f14d-a23e-84f6-b3e7afc92985
 ###
 proc ::community::wrapPage objresult {
   set page [::html-style::template [::page layout]]

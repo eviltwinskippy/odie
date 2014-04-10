@@ -11,7 +11,7 @@
 ::namespace eval ::llama::wiki {}
 
 ###
-# topic: 9b528d28-65e1-3580-b72e-e5772374e6d8
+# topic: a3826bd0-d803-92c6-6bdd-c3b1165aa54e
 ###
 proc ::llama::colObj_row {colObj value} { 
   return "\[row\]\[col [list [$colObj Label]]\]\[col [list [$colObj Display $value]]\]\[/row\]"
@@ -37,7 +37,7 @@ proc ::llama::expand {nspace buffer {state {}}} {
 }
 
 ###
-# topic: 973cd03c-1bef-87fe-0681-eefec42de9c5
+# topic: b3c8843f-da82-bd86-ff59-f605f4489d9f
 ###
 proc ::llama::imageObj {image_id {size web}} {
     set location {}
@@ -183,7 +183,7 @@ set string $args
   }
 
 ###
-# topic: 2f87199e-5d58-3cce-3e55-dd15e676d371
+# topic: dfe96310-a7f2-8878-3811-2566317f315a
 ###
 proc ::llama::tkIcon name {
   if { [info commands ::img::llama${name}] == {} } { 
@@ -205,7 +205,7 @@ proc ::llama::wiki::expand {buffer {state {}}} {
 }
 
 ###
-# topic: 39ae1ec9-ef50-87c6-43f3-bc0c2488bce0
+# topic: 73e13c01-e373-9bc0-add6-f32ddfc3fa01
 ###
 proc ::llama::wiki::topicUnknown args {
   #puts "Unknown - $args"
@@ -793,7 +793,7 @@ namespace eval ::llama::wiki {
 ###
 namespace eval ::llama::latex {
   variable container wiki
-  namespace import ::llama::*
+  namespace import -force ::llama::*
 
   ###
   #  Replicate ::wiki tags for latex

@@ -1,3 +1,6 @@
+# \
+exec wish "$0" ${1+"$@"}
+
 ###
 # Example image browser
 ###

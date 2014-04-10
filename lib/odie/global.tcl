@@ -104,7 +104,7 @@ ensemble_method ::ldelete {varname args} {
   }
   foreach item [lsort -unique $args] {
     while {[set i [lsearch $var $item]]>=0} {
-      set var [lreplace $var $i $i {}]
+      set var [lreplace $var $i $i]
     }
   }
 }
