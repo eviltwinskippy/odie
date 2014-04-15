@@ -12,6 +12,18 @@ oo::class create sherpa.sae {
     return [file normalize [file join $::odie(sandbox) toadkit-build]]
   }
   
+
+  method sherpa_present {} {
+    global exe odie
+    set fname [file join ${odie(local_repo)} bin [my property exe_name]$exe]
+    puts $fname
+    return [file exists $fname]
+  }
+  
+  method build_csources {} {
+    
+  }
+  
   method build_depends {} {
     global odie tcl_platform cc exe
     cd [file join $odie(sandbox) odie]
@@ -206,13 +218,12 @@ sherpa::module tclkit {
     
     set buildargs [list $cc {*}$objs {*}$static_linked_objects {*}$static_linked_libraries {*}$ldflags]
     doexec {*}$buildargs -o [my property exe_name]$exe
-    #doexec $stripexe toadkit_bare$exe
-    
+    doexec strip [my property exe_name]$exe
+
     file copy -force [my property exe_name]$exe ${odie(local_repo)}/bin  
-    #file copy -force zzipsetupstub$exe ${odie(local_repo)}/bin
     if {![file exists [file join $odie(local_repo) bin default_tclsh.tcl]]} {
        file copy [file join $::odie(sandbox) odie src toadkit default_tclsh.tcl] [file join $odie(local_repo) bin default_tclsh.tcl]
-    }
+    } 
   }
 }
 
@@ -229,8 +240,7 @@ sherpa::module toadkit {
     set buildpath [my build_path_local]
 
   }
-
-
+  
   method step_compile_do {} {
     global odie tcl_platform cc exe
     
@@ -322,16 +332,19 @@ sherpa::module toadkit {
     
     set buildargs [list $cc {*}$objs {*}$static_linked_objects {*}$static_linked_libraries {*}$ldflags]
     doexec {*}$buildargs -o [my property exe_name]$exe
-    #doexec $stripexe toadkit_bare$exe
+    doexec strip [my property exe_name]$exe
     
     file copy -force [my property exe_name]$exe ${odie(local_repo)}/bin  
-    #file copy -force zzipsetupstub$exe ${odie(local_repo)}/bin
+    if {![file exists [file join $odie(local_repo) bin default.tcl]]} {
+       file copy [file join $::odie(sandbox) odie src toadkit default.tcl] [file join $odie(local_repo) bin default.tcl]
+    }
+
+    file copy -force [my property exe_name]$exe ${odie(local_repo)}/bin  
     if {![file exists [file join $odie(local_repo) bin default.tcl]]} {
        file copy [file join $::odie(sandbox) odie src toadkit default.tcl] [file join $odie(local_repo) bin default.tcl]
     }
   }
 }
-
 
 sherpa::module sampletoadkit {
   package_name sampletoadkit

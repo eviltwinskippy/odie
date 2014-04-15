@@ -168,18 +168,16 @@ proc ::codebale::complete_ccomment string {
     if {$idx < 0} break
     incr idx 2
     incr opened
-  }
-  if {!$opened} {
-    return 1
-  }
-  set idx 0
-  while {1} {
+    
     set idx [string first "*/" $string $idx]
     if {$idx < 0} break
     incr idx 2
     incr closed
   }
-  if { $opened > $closed } {
+  if {!$opened} {
+    return 1
+  }
+  if { $opened != $closed } {
     return 0
   }
   return 1
@@ -192,10 +190,6 @@ proc ::codebale::complete_ccomment string {
 # in ways that info complete will not detect
 ###
 proc ::codebale::complete_cstatement {line {trace 0}} {
-  # Easy out see if Tcl likes it
-  if {[info complete $line]} {
-    return 1
-  }
   set n [string length $line]
   set dquotes   0
   set squote   0
@@ -203,16 +197,17 @@ proc ::codebale::complete_cstatement {line {trace 0}} {
   set paren    0
   set bracket   0
   set j 0
-
+    
   for {set i 0} {$i < $n} {incr i} {
     if {[string index $line [expr {$i-1}]] eq "\x5c"} continue
     switch [string index $line $i] {
-      / {
+      "/" {
         ###
         # Ignore the contents of comments and return incomplete
         # if a comment is started on this line but not terminated
         ###
-        if {[string index $line [expr {$i+1}]] eq "*"} {
+        set next [string index $line [expr {$i+1}]]
+        if {$next eq "*"} {
           set endcomment [string first "*/" $line $i]
           if { $endcomment >= 0 } {
             set i [expr {$endcomment+2}]
@@ -220,11 +215,19 @@ proc ::codebale::complete_cstatement {line {trace 0}} {
           } else {
             return 0
           }
+        } elseif { $next eq "/"} {
+          set endcomment [string first "\n" $line $i]
+          if { $endcomment >= 0 } {
+            set i [expr {$endcomment+2}]
+            continue
+          } else {
+            break
+          }
         }
       }
       \x27 {
         # Single quotes can't embed anything else
-        # but they can have several encodings
+        # but they can have several encodings        
         set next [string first \x27 $line [expr {$i+1}]]
         if { $next < 0} {
           return 1
@@ -232,7 +235,18 @@ proc ::codebale::complete_cstatement {line {trace 0}} {
         set i $next
       }
       \x22 {
-        incr dquotes
+        while 1 {
+          set next [string first \x22 $line [expr {$i+1}]]
+          if { $next < 0} {
+            return 1
+          }
+          set i $next
+          if {[string index $line [expr {$next-1}]] eq "\\"} {
+            continue
+          }
+          break
+          #incr dquotes
+        }
       }
       \x28 {
         incr paren
@@ -349,203 +363,206 @@ proc ::codebale::digest_comment {buffer {properties {}}} {
   return [array get result]
 }
 
+proc ::codebale::digest_cstatement {thisline resultvar {trace 0}} {
+  upvar 1 $resultvar result
+  if { [string match "*const*Tcl_ObjType*=*" $thisline] } {
+    set pline [string range $thisline 0 [string first "=" $thisline]-1]
+    if { $trace } {puts "TCL OBJ TYPE DECLARED $pline "}
+    dict lappend result objtypes_defined [lindex $pline end]
+  }
+  if { [string match "*const*Tk_PhotoImageFormat*=*" $thisline] } {
+    set pline [string range $thisline 0 [string first "=" $thisline]-1]
+    if { $trace } {puts "TCL PHOTO TYPE DECLARED $pline "}
+    dict lappend result phototypes_defined [lindex $pline end]
+  } 
+}
+
 ###
 # topic: 4971b1be-8596-2744-bfb3-869375d60357
 ###
 proc ::codebale::digest_csource {dat {trace 0}} {
   set ::readinglinenumber 0
   set ::readingline {}
-  
-  set result {}
-  set funcregexp {(.*) ([a-zA-Z_][a-zA-Z0-9_]*) *\((.*)\)}
-  set funcregexp2 {(.*) (\x2a[a-zA-Z_][a-zA-Z0-9_]*) *\((.*)\)}
+  set result {}  
 
   set priorline {}
   set thisline {}
   set rawblock {}
   set continueline 0
-  set inknrdef 0
-  set infunct 0
+  set continue_stmt 0
   set isfunct 0
   set inparen 0
-  set intypedef 0
-  set instruct 0
-  set psplit 0
-  set incomment 0
+
   set instatement 0
   set parseline {}
   set thisfunct {}
-  set priorcomment {}
-
+  
+  ###
+  # Remove comments
+  ###
+  set dat [strip_ccoments $dat]
+  
   ###
   # Place to store code that surrounds the functions
   ###
   dict set result code {}
-
-  foreach rawline [split $dat \n] {
+  set llines [split $dat \n]
+  foreach rawline $llines {
     incr ::readinglinenumber
     set ::readingline $rawline
     append rawblock $rawline \n
-    set wasincomment $incomment
-    
+    regsub -all \x7b $rawline \x20\x7b line
     if {[regexp {^ *case *([A-Z]+)_([A-Z0-9_]+):} $rawline all prefix label]} {
       lappend cases($prefix) $label
     }
+    if { $trace } {puts "$continueline | $continue_stmt $line" ; update}
+    if {[string trim $line ] eq {} } continue
+    append thisline \n [string trim $line]
     
-    regsub -all \x7b $rawline \x20\x7b line
-    if { $trace } {puts "$continueline $instatement $infunct $inparen $incomment [string length $priorcomment] | $line"}
-    if {$incomment} {
-      append thisline \n [string trim $line]
-      if {[string first "*/" $thisline] <0} continue
-      append priorcomment \n $rawblock
-      set incomment 0
-      set isfunct -1
-    } elseif {$inparen} {
-      set funcname {} 
-      append thisline \n "  [string trim $line]"
-      set parenidx [string first ")" $thisline]
-      set lastchar [string index [string trim $thisline] end] 
-      if {$trace} { puts [list $parenidx $lastchar] }
-      ###
-      # Wait for the trailing parenthesis and starting curly
-      ###
-      if {$parenidx < 0} continue
-      if {$lastchar ne "\;" } {
-        if {[string first "\{" $thisline $idx] < 0} continue
-      }        
-      set psplit 1
-      set inparen 0
-    } elseif {$instatement} {
-      append thisline \n [string trim $line]
-      if {[complete_cstatement $thisline]} {
-        if { $trace } { puts "ENDOFSTATEMENT" }
-        set rawblock {}
-        set infunct 0
-        set isfunct 0
-        set instatement 0
-        if { [string match "*const*Tcl_ObjType*=*" $thisline] } {
-          set pline [string range $thisline 0 [string first "=" $thisline]-1]
-          if { $trace } {puts "TCL OBJ TYPE DECLARED $pline "}
-          dict lappend result objtypes_defined [lindex $pline end]
-        }
-        if { [string match "*const*Tk_PhotoImageFormat*=*" $thisline] } {
-          set pline [string range $thisline 0 [string first "=" $thisline]-1]
-          if { $trace } {puts "TCL PHOTO TYPE DECLARED $pline "}
-          dict lappend result phototypes_defined [lindex $pline end]
-        }
-        set thisline {}
-        continue
-      } else {
-        continue
-      }    
-    } elseif {$infunct} {
-      append thisline \n [string trim $line]
-      if {[complete_cstatement $thisline $trace]} {
-        if { $trace } { puts "ENDOFFUNCTION" }
-        if { $thisfunct ne {} } {
-          dict set result function $thisfunct body $rawblock
-        }
-        set rawblock {}
-        set thisline {}
-        set infunct 0
-        set isfunct 0
-        continue
-      } else {
-        continue
-      }
-    } elseif {$continueline} {
-      append thisline " " [string trim $line]
-    } else {
-      append thisline \n [string trim $line]
-    }
-    if {[string range [string trim $line] 0 1] eq "//"} {
-      set isfunct -1
-    } elseif {[string range [string trim $line] 0 1] eq "/*"} {
-      # Handle comments
-      set isfunct -1
-      if {[string first "*/" $thisline] <0} {
-        set incomment 1
-        set comment 1
-        continue
-      }
-    } elseif {[set idx [string first "(" $thisline]] > 0} {
-      if {[string first ")" $thisline] < 0} {
-        set inparen 1
-        continue
-      }
-    }
+    ###
+    # continue_stmt is on one the following states:
+    # 0 - unknown
+    # 1 - finish C statement/function
+    # 2 - detect function
+    ###
 
-    set parseline [string trim $thisline]
-    if {[string range $parseline 0 1] eq "//"} {
-      set isfunct -1
-    }
-    if {[string index $parseline 0] eq "#"} {
-      set isfunct -1
-    }
-    if {![::codebale::complete_ccomment $parseline]} {
-      continue
-    }
-    set parseline [::codebale::strip_ccoments $parseline]
-    if {[string index $parseline end] eq "\;" } {
-      set isfunct -1
-      set priorcomment {}
-      if { $trace } { puts "CSTATEMENT" }
-    }
-    if {$isfunct == 0} {
-      set isfunct [regexp $funcregexp $parseline all keywords funcname arglist]
-      if { $isfunct == 0 } {
-        set isfunct [regexp $funcregexp2 $parseline all keywords funcname arglist]
-      }
-    }
-    if {$isfunct > 0} {
-      if {[string first "\{" $parseline] < 0} {
-        incr continueline
-        continue
-      }
-      set all [string trim $all]
-      set declargs {}
-      foreach item [split $arglist ,] {
-        lappend declargs [string trim $item]
-      }
-      if { $trace } { puts "$keywords $funcname\([join $declargs ", "]\) | $arglist" }
-      set thisfunct $funcname
-      dict set result function $thisfunct comment $priorcomment
-      dict set result function $thisfunct keywords $keywords
-      dict set result function $thisfunct arglist $declargs
-      set priorcomment {}
-      
-      set infunct 1
-      set isfunct 0
-      set continueline 0
-    } elseif { $isfunct == 0 } {
-      if {![complete_cstatement $thisline]} {
-        set instatement 1
-        continue
-      }
-      if {![regexp (void|unsigned|static|int|char|inline|extern) $thisline]} {
-        if { $trace } { puts "!KEYWORDS" }
-        dict append result code "$rawblock"
-        set priorcomment {}
-        set thisline {}
+    ###
+    # Handle incomplete lines
+    ###
+    switch $continue_stmt {
+      1 {
+        #if { $trace } {puts "$continueline | cs 1" ; update}
+
+        if {![complete_cstatement $thisline $trace]} {
+          incr continueline
+          continue
+        } 
+        # Waiting for end of function body
+        if { $trace } { puts "STATEMENT" }
+        if { $thisfunct eq {} } {
+          digest_cstatement $thisline result $trace
+          #dict set result function $thisfunct body $rawblock
+        }
+        set thisfunct {}
         set rawblock {}
-        set infunct 0
-        set isfunct 0
+        set thisline {}
+        set continue_stmt 0
         set continueline 0
-      } else {
-        incr continueline
-        continue
+        set isfunct 0
       }
-    } else {
-      if { $trace } { puts "KILLTERM" }
-      dict append result code "$rawblock"
-      set thisline {}
-      set rawblock {}
-      set infunct 0
-      set isfunct 0
-      set continueline 0
-    }    
+      2 {
+        if {[string first \x7B $thisline] < 0} {
+          incr continueline
+          continue
+        }
+        if {[complete_cstatement $thisline $trace]} {
+          # Waiting for end of function body
+          if { $trace } { puts "STATEMENT" }
+          if { $thisfunct eq {} } {
+            digest_cstatement $thisline result $trace
+            #dict set result function $thisfunct body $rawblock
+          }
+          set rawblock {}
+          set thisline {}
+          set continue_stmt 0
+          set continueline 0
+          set isfunct 0
+        } else {
+          set continue_stmt 1
+          incr continueline
+          continue
+        }
+      }
+      default {
+        set parseline [string map [list \x7b \x20\x7b \n \x20] [string trim $thisline]]
+        #regsub -all \x7b $parseline \x20\x7b parseline
+        #regsub -all \x7b $parseline \x20\x7b parseline
+        
+        ###
+        # NEEDED: A MORE ROBUST IMPLEMENTATION TO CATCH THE PASSING OF
+        # FUNCTIONS, WITH THEIR OWN PROTOTYPES
+        # EXAMPLES:
+#void TreeInit(
+#  Tree *tree,                                 /* Tree object to initialize */
+#  int (*xCompare)(const void*, const void*),  /* Comparison function */
+#  void *(*xCopy)(const void*),                /* Key copy function or NULL */
+#  void (*xFree)(void*)                        /* Key delete function or NULL */
+#){
+#  tree->xCompare = xCompare;
+#  tree->xCopy = xCopy;
+#  tree->xFree = xFree;
+#  tree->top = 0;
+#}
+        ###
+
+
+        foreach regexp {
+             {(.*) ([a-zA-Z_][a-zA-Z0-9_]*) *\((.*)\)}
+             {(.*) (\x2a[a-zA-Z_][a-zA-Z0-9_]*) *\((.*)\)}
+        } {
+          set isfunct [regexp $regexp $parseline all keywords funcname arglist]
+
+          if { $isfunct > 0} {
+            if {[string index $parseline end] eq "\;"} {
+              set isfunct 0
+              break
+            }
+            ###
+            # We can't rely on the above regexp to suss out the headers
+            # because of cases where a function pointer is declared
+            ###
+            
+            set all [string trim $all]
+            set declargs {}
+            foreach item [split $arglist ,] {
+              lappend declargs [string trim $item]
+            }
+            if { $trace } { puts "FUNCTION $keywords $funcname\([join $declargs ", "]\) | $arglist" }
+            set thisfunct $funcname
+            dict set result function $thisfunct keywords $keywords
+            dict set result function $thisfunct arglist $declargs
+            break
+          }
+        }
+        if { $isfunct } {
+          # If we can't see a curly bracket, parse until we do
+          if {[string first \x7B $thisline] < 0} {
+            set continue_stmt 2
+            incr continueline
+            continue
+          }
+      
+          if {![complete_cstatement $thisline $trace]} {
+            set continue_stmt 1
+            incr continueline
+            continue
+          }
+          # Function was implemented in one line
+          set rawblock {}
+          set thisline {}
+          set continue_stmt 0
+          set continueline 0
+          set isfunct 0
+        } else {
+          if {![complete_cstatement $thisline $trace]} {
+            incr continueline
+            continue
+          }
+          if {[string index $parseline end] eq "\;" } {
+            set continue_stmt 0
+            if { $trace } { puts "CSTATEMENT" }
+            digest_cstatement $thisline $trace
+            set rawblock {}
+            set continue_stmt 0
+            set isfunct 0
+            set instatement 0
+            set thisline {}
+          }
+        }
+      }
+    }
   }
-  if { $infunct } {
+  if { $continue_stmt } {
     error "Stopped waiting for end of function $thisfunct"
   }
   if {[info exists cases]} {
@@ -554,39 +571,19 @@ proc ::codebale::digest_csource {dat {trace 0}} {
   return $result
 }
 
-###
-# topic: 9dd91e4b-98b0-0126-0e30-671883da494b
-# description: Generate function declarations
-###
-proc ::codebale::headers_csourcefile file {  
-  ###
-  # Skip huge files
-  ###
-  if {[file size $file] > 500000} {return {}}
-  set fin [open $file r]
-  set dat [read $fin]
-  close $fin
-  set result [digest_csource $dat]
-  set functions {}
-  if [catch {
-  foreach {funcname info} [lsort -dictionary -stride 2 [dictGet $result function]] {
-    dict with info {
-      if { "static" in $keywords } continue
-      append functions "$keywords $funcname\([join $arglist ", "]\)\x3b" \n
+proc ::codebale::detect_cases cfile {
+  set fin [open $cfile r]
+  while {[gets $fin line] >= 0} {
+    if {[regexp {^ *case *([A-Z]+)_([A-Z0-9_]+):} $line all prefix label]} {
+      lappend cases($prefix) $label
     }
   }
-  } err] {
-    puts "ERROR Parsing $file: $err"
-    return "/*
-** $file
-** Process cancelled because of errors
-** $err
-** Line number: $::readinglinenumber
-** Line: $::readingline
-*/
-"
+  close $fin
+  set result {}
+  foreach item [array names cases] {
+    lappend result [string tolower ${item}_cases.h]
   }
-  return $functions
+  return $result
 }
 
 ###
@@ -1607,12 +1604,14 @@ proc ::codebale::sniffPath {spath stackvar} {
 ###
 # topic: 47266d90-061e-780e-234e-c3245d85c176
 ###
-proc ::codebale::strip_ccoments string {
+proc ::codebale::strip_ccoments buffer {
+  
+  ###
+  # Strip C /* comments */
+  ###
+  set string $buffer
   set result {}
   set idx 0
-  if {![complete_ccomment $string]} {
-    error "Incomplete C comment: $string"
-  }
   while {[set ndx [string first "/*" $string $idx]] >=0 } {
     append result [string range $string $idx [expr {$ndx-1}]]
     set idx [string first */ $string [expr {$ndx+2}]]
@@ -1622,6 +1621,51 @@ proc ::codebale::strip_ccoments string {
     incr idx 2
   }
   append result [string range $string $idx end]
+
+  ###
+  # Strip C++ // comments
+  ###
+  set string $result
+  set result {}
+  set idx 0
+  while {[set ndx [string first "//" $string $idx]] >=0 } {
+    append result [string range $string $idx [expr {$ndx-1}]]
+    set idx [expr {$ndx+1}]
+    while 1 {
+      set idx [string first "\n" $string $idx]
+      if { $idx < 0 } {
+        break
+      }
+      if {[string index $string [expr {$idx-1}]] == "\\"} {
+        incr idx
+        continue
+      }
+      break
+    }
+    incr idx
+  }
+  append result [string range $string $idx end]
+  
+  set string [split $result \n]
+  set result {}
+  set continueline 0
+  foreach line $string {
+    set line [string trim $line]
+    if {$continueline} {
+      if {[string index $line end] ne "\\"} {
+        set continueline 0
+      }
+    } else {
+      if {[string index $line 0] eq "#"} {
+        if {[string index $line end] eq "\\"} {
+          set continueline 1
+        }
+      } else {
+        append result \n $line
+      }
+    }
+  }
+  return $result
 }
 
 proc ::codebale::first_autoconf_token line {

@@ -11,5 +11,6 @@ TCL_CONFIG_FLAGS=
 TK_CONFIG_FLAGS=
 export TCL_SHELL=${LOCAL_REPO}/bin/tclsh86.exe
 export WISH_SHELL=${LOCAL_REPO}/bin/wish86.exe
+ZIP=zip
 
 PLATFORM=win

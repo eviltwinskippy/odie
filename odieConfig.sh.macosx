@@ -11,5 +11,6 @@ TCL_CONFIG_FLAGS=--enable-framework=no
 TK_CONFIG_FLAGS=--enable-aqua=yes --enable-corefoundation=yes
 TCL_SHELL=${LOCAL_REPO}/bin/tclsh8.6
 WISH_SHELL=${LOCAL_REPO}/bin/wish8.6
+ZIP=zip
 
 PLATFORM=unix

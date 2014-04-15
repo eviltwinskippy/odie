@@ -42,8 +42,7 @@ Toadkit_AppInit(interp)
   */
   Zvfs_Init(interp);
   if(Zvfs_Mount(interp, cp, "/zvfs")) {
-    printf("Mount Error: %s\nReverting to Tcl Shell\n",Tcl_GetObjResult(interp));
-    Tcl_SetStartupScript(Tcl_NewStringObj("~/odie/bin/default_tclsh.tcl",-1),NULL);
+    Tcl_SetStartupScript(NULL,NULL);
   } else {
     Tcl_SetVar2(interp, "env", "TCL_LIBRARY", "/zvfs/tcl", TCL_GLOBAL_ONLY);
   }  

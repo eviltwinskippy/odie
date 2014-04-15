@@ -28,6 +28,7 @@ foreach {mod props} {
   tkhtml        {}
   canvas3d      {}
   odielib       {}
+  bonjour       {}
 } {
   set properties "
     module $mod
